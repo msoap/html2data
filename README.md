@@ -26,3 +26,4 @@ See also
 --------
 
   * [Python package with same name and functionality](https://pypi.python.org/pypi/html2data)
+  * [Node.js module](https://www.npmjs.com/package/html2data)
