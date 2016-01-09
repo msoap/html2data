@@ -14,7 +14,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	for _, text := range texts["one"] {
-		fmt.Println(text)
+	if textOne, ok := texts["one"]; ok {
+		for _, text := range textOne {
+			fmt.Println(text)
+		}
 	}
 }
