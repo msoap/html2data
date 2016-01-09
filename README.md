@@ -55,6 +55,16 @@ Command line utility
     # update:
     brew update; brew upgrade html2data
 
+### examples
+
+Get title of page:
+
+    html2data https://golang.org/ title
+
+Last blog posts:
+
+    html2data https://blog.golang.org h3
+
 See also
 --------
 
