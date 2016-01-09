@@ -6,7 +6,40 @@ Simple wrapper for [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoB
 Install
 -------
 
+Install package and command line utility:
+
+    go get -u github.com/msoap/html2data/cmd/html2data
+
+Install package only:
+
     go get -u github.com/msoap/html2data
+
+Example
+-------
+
+    // get title for url
+    package main
+    
+    import (
+    	"fmt"
+    	"log"
+    	"os"
+        
+    	"github.com/msoap/html2data"
+    )
+    
+    func main() {
+    	texts, err := html2data.GetData("url", map[string]string{"one": "title"})
+    	if err != nil {
+    		log.Fatal(err)
+    	}
+        
+    	if textOne, ok := texts["one"]; ok {
+    		for _, text := range textOne {
+    			fmt.Println(text)
+    		}
+    	}
+    }
 
 Command line utility
 --------------------
