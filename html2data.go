@@ -1,4 +1,4 @@
-package main
+package html2data
 
 import (
 	"bufio"
@@ -12,13 +12,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func get_html_page(weather_url string) *http.Response {
+func getHTMLPage(url string) *http.Response {
 	cookie, _ := cookiejar.New(nil)
 	client := &http.Client{
 		Jar: cookie,
 	}
 
-	response, err := client.Get(weather_url)
+	response, err := client.Get(url)
 
 	if err != nil {
 		log.Fatal(err)
@@ -27,7 +27,8 @@ func get_html_page(weather_url string) *http.Response {
 	return response
 }
 
-func getData(url string, selectors map[string]string) (result map[string][]string) {
+// GetData - extract data by CSS selectors from URL or HTML page
+func GetData(url string, selectors map[string]string) (result map[string][]string) {
 	var err error
 	var doc *goquery.Document
 	result = map[string][]string{}
@@ -37,10 +38,8 @@ func getData(url string, selectors map[string]string) (result map[string][]strin
 		stdinReader := bufio.NewReader(os.Stdin)
 		doc, err = goquery.NewDocumentFromReader(stdinReader)
 	} else {
-		http_response := get_html_page(url)
-		b, _ := ioutil.ReadAll(http_response.Body)
-		fmt.Println(string(b))
-		doc, err = goquery.NewDocumentFromReader(http_response.Body)
+		httpResponse := getHTMLPage(url)
+		doc, err = goquery.NewDocumentFromReader(httpResponse.Body)
 	}
 
 	if err != nil {
@@ -56,12 +55,4 @@ func getData(url string, selectors map[string]string) (result map[string][]strin
 	}
 
 	return result
-}
-
-// go run html2data.go url "tr.quote__day:nth-child(2) td.quote__value"
-func main() {
-	texts := getData(os.Args[1], map[string]string{"one": os.Args[2]})
-	for _, text := range texts["one"] {
-		fmt.Println(text)
-	}
 }
