@@ -2,8 +2,6 @@ package html2data
 
 import (
 	"bufio"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
