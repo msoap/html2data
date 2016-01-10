@@ -1,6 +1,8 @@
 html2data
 =========
 
+[![GoDoc](https://godoc.org/github.com/msoap/html2data?status.svg)](https://godoc.org/github.com/msoap/html2data)
+
 Extract data from HTML via CSS selectors
 
 Install
