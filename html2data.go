@@ -1,3 +1,15 @@
+/*
+Package html2data - extract data from HTML via CSS selectors
+
+Install package and command line utility:
+
+	go get -u github.com/msoap/html2data/cmd/html2data
+
+Install package only:
+
+	go get -u github.com/msoap/html2data
+
+*/
 package html2data
 
 import (
@@ -10,18 +22,23 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// GetDataFromReader - extract data by CSS selectors from io.Reader
-func GetDataFromReader(reader io.Reader, selectors map[string]string) (result map[string][]string, err error) {
-	result = map[string][]string{}
-	doc, err := goquery.NewDocumentFromReader(reader)
+// Doc - html document for parse
+type Doc struct {
+	doc *goquery.Document
+	Err error
+}
 
-	if err != nil {
-		return result, fmt.Errorf("GetData error: ", err)
+// GetData - extract data by CSS selectors
+// texts, err := doc.GetData(map[string]string{"title": "title"})
+func (doc Doc) GetData(selectors map[string]string) (result map[string][]string, err error) {
+	if doc.Err != nil {
+		return result, fmt.Errorf("parse document error: %s", doc.Err)
 	}
 
+	result = map[string][]string{}
 	for name, selector := range selectors {
 		texts := []string{}
-		doc.Find(selector).Each(func(i int, selection *goquery.Selection) {
+		doc.doc.Find(selector).Each(func(i int, selection *goquery.Selection) {
 			texts = append(texts, selection.Text())
 		})
 		result[name] = texts
@@ -30,25 +47,31 @@ func GetDataFromReader(reader io.Reader, selectors map[string]string) (result ma
 	return result, err
 }
 
-// GetDataFromFile - extract data by CSS selectors from file
-func GetDataFromFile(fileName string, selectors map[string]string) (result map[string][]string, err error) {
+// FromReader - get doc from io.Reader
+func FromReader(reader io.Reader) Doc {
+	doc, err := goquery.NewDocumentFromReader(reader)
+	return Doc{doc, err}
+}
+
+// FromFile - get doc from file
+func FromFile(fileName string) Doc {
 	fileReader, err := os.Open(fileName)
 	if err != nil {
-		return result, err
+		return Doc{Err: err}
 	}
 	defer fileReader.Close()
 
-	return GetDataFromReader(fileReader, selectors)
+	return FromReader(fileReader)
 }
 
-// GetDataFromURL - extract data by CSS selectors from URL
-func GetDataFromURL(URL string, selectors map[string]string) (result map[string][]string, err error) {
+// FromURL - get doc from URL
+func FromURL(URL string) Doc {
 	httpResponse, err := getHTMLPage(URL)
 	if err != nil {
-		return result, err
+		return Doc{Err: err}
 	}
 
-	return GetDataFromReader(httpResponse.Body, selectors)
+	return FromReader(httpResponse.Body)
 }
 
 // getHTMLPage - get html by http(s) as http.Response

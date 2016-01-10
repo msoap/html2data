@@ -30,12 +30,12 @@ import (
 )
 
 func main() {
-	texts, err := html2data.GetDataFromURL("http://example.com", map[string]string{"one": "title"})
+	texts, err := html2data.FromURL("http://example.com").GetData(map[string]string{"title": "title"})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if textOne, ok := texts["one"]; ok {
+	if textOne, ok := texts["title"]; ok {
 		for _, text := range textOne {
 			fmt.Println(text)
 		}

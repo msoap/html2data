@@ -25,22 +25,23 @@ func main() {
 		return
 	}
 
-	var texts map[string][]string
 	var err error
+	var doc html2data.Doc
 	stat, _ := os.Stdin.Stat()
 
 	if url == "-" || (stat.Mode()&os.ModeCharDevice) == 0 {
 		reader := bufio.NewReader(os.Stdin)
-		texts, err = html2data.GetDataFromReader(reader, map[string]string{"one": CSSSelector})
+		doc = html2data.FromReader(reader)
 	} else if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
-		texts, err = html2data.GetDataFromURL(url, map[string]string{"one": CSSSelector})
+		doc = html2data.FromURL(url)
 	} else if len(url) > 0 {
-		texts, err = html2data.GetDataFromFile(url, map[string]string{"one": CSSSelector})
+		doc = html2data.FromFile(url)
 	} else {
 		fmt.Println(usageString)
 		return
 	}
 
+	texts, err := doc.GetData(map[string]string{"one": CSSSelector})
 	if err != nil {
 		log.Fatal(err)
 	}
