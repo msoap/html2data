@@ -1,7 +1,7 @@
 html2data
 =========
 
-Simple wrapper for [github.com/PuerkitoBio/goquery](https://github.com/PuerkitoBio/goquery/)
+Extract data from HTML via CSS selectors
 
 Install
 -------
@@ -17,29 +17,38 @@ Install package only:
 Example
 -------
 
-    // get title for url
-    package main
-    
-    import (
-    	"fmt"
-    	"log"
-    	"os"
-        
-    	"github.com/msoap/html2data"
-    )
-    
-    func main() {
-    	texts, err := html2data.GetData("url", map[string]string{"one": "title"})
-    	if err != nil {
-    		log.Fatal(err)
-    	}
-        
-    	if textOne, ok := texts["one"]; ok {
-    		for _, text := range textOne {
-    			fmt.Println(text)
-    		}
-    	}
-    }
+```go
+// get title for url
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/msoap/html2data"
+)
+
+func main() {
+	texts, err := html2data.GetDataFromURL("http://example.com", map[string]string{"one": "title"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if textOne, ok := texts["one"]; ok {
+		for _, text := range textOne {
+			fmt.Println(text)
+		}
+	}
+}
+```
+
+TODO
+----
+
+  * get tag attributes
+  * html2data: get by several selectors
+  * html2data: get JSON
 
 Command line utility
 --------------------
@@ -48,7 +57,7 @@ Command line utility
     html2data file.html "css selector"
     cat file.html | html2data "css selector"
 
-### install
+### TODO: install from homebrew
 
     brew tap msoap/tools
     brew install html2data
@@ -63,10 +72,11 @@ Get title of page:
 
 Last blog posts:
 
-    html2data https://blog.golang.org h3
+    html2data https://blog.golang.org/ h3
 
 See also
 --------
 
   * [Python package with same name and functionality](https://pypi.python.org/pypi/html2data)
   * [Node.js module](https://www.npmjs.com/package/html2data)
+  * [Go package for CSS selectors](https://github.com/PuerkitoBio/goquery/)
