@@ -29,7 +29,7 @@ type Doc struct {
 }
 
 // GetData - extract data by CSS selectors
-// texts, err := doc.GetData(map[string]string{"title": "title"})
+// texts, err := doc.GetData(map[string]string{"h1": "h1"})
 func (doc Doc) GetData(selectors map[string]string) (result map[string][]string, err error) {
 	if doc.Err != nil {
 		return result, fmt.Errorf("parse document error: %s", doc.Err)
@@ -42,6 +42,25 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 			texts = append(texts, selection.Text())
 		})
 		result[name] = texts
+	}
+
+	return result, err
+}
+
+// GetDataSingle - extract data by CSS selectors
+// title, err := doc.GetDataSingle("title")
+func (doc Doc) GetDataSingle(selector string) (result string, err error) {
+	if doc.Err != nil {
+		return result, fmt.Errorf("parse document error: %s", doc.Err)
+	}
+
+	texts, err := doc.GetData(map[string]string{"single": selector})
+	if err != nil {
+		return result, err
+	}
+
+	if textOne, ok := texts["single"]; ok && len(textOne) > 0 {
+		result = textOne[0]
 	}
 
 	return result, err

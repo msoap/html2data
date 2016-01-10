@@ -18,28 +18,32 @@ Example
 -------
 
 ```go
-// get title for url
 package main
 
 import (
-	"fmt"
-	"log"
-	"os"
+    "fmt"
+    "log"
 
-	"github.com/msoap/html2data"
+    "github.com/msoap/html2data"
 )
 
 func main() {
-	texts, err := html2data.FromURL("http://example.com").GetData(map[string]string{"title": "title"})
-	if err != nil {
-		log.Fatal(err)
-	}
+    doc := html2data.FromURL("http://example.com")
+    if doc.Err != nil {
+        log.Fatal(doc.Err)
+    }
 
-	if textOne, ok := texts["title"]; ok {
-		for _, text := range textOne {
-			fmt.Println(text)
-		}
-	}
+    // get title
+    title, _ := doc.GetDataSingle("title")
+    fmt.Println("Title is:", title)
+
+    // get all H1 headers:
+    texts, _ := doc.GetData(map[string]string{"h1": "h1"})
+    if textOne, ok := texts["h1"]; ok {
+        for _, text := range textOne {
+            fmt.Println(text)
+        }
+    }
 }
 ```
 
