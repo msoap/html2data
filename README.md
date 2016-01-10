@@ -14,6 +14,15 @@ Install package only:
 
     go get -u github.com/msoap/html2data
 
+Methods
+-------
+
+  * `FromReader(io.Reader)` - create document for parse
+  * `FromURL(URL)` - create document from http(s) URL
+  * `FromFile(file)` - create document from local file
+  * `doc.GetData(map[string]string)` - get texts by CSS selectors
+  * `doc.GetDataSingle(string)` - get text by one CSS selector
+
 Example
 -------
 
