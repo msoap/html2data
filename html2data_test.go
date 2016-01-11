@@ -7,7 +7,7 @@ import (
 )
 
 func Test_GetDataSingle(t *testing.T) {
-	test_data := []struct {
+	testData := []struct {
 		html string
 		css  string
 		out  string
@@ -23,12 +23,12 @@ func Test_GetDataSingle(t *testing.T) {
 		},
 	}
 
-	for _, item := range test_data {
+	for _, item := range testData {
 		reader := strings.NewReader(item.html)
 		out, err := FromReader(reader).GetDataSingle(item.css)
 
 		if err != nil {
-			t.Errorf("Got error:", err)
+			t.Errorf("Got error: %s", err)
 		}
 
 		if out != item.out {
@@ -38,7 +38,7 @@ func Test_GetDataSingle(t *testing.T) {
 }
 
 func Test_GetData(t *testing.T) {
-	test_data := []struct {
+	testData := []struct {
 		html string
 		css  map[string]string
 		out  map[string][]string
@@ -54,12 +54,12 @@ func Test_GetData(t *testing.T) {
 		},
 	}
 
-	for _, item := range test_data {
+	for _, item := range testData {
 		reader := strings.NewReader(item.html)
 		out, err := FromReader(reader).GetData(item.css)
 
 		if err != nil {
-			t.Errorf("Got error:", err)
+			t.Errorf("Got error: %s", err)
 		}
 
 		if !reflect.DeepEqual(item.out, out) {
