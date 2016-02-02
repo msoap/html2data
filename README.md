@@ -54,10 +54,16 @@ func main() {
     title, _ := doc.GetDataSingle("title")
     fmt.Println("Title is:", title)
 
+    texts, _ := doc.GetData(map[string]string{"h1": "h1", "links": "a:attr(href)"})
     // get all H1 headers:
-    texts, _ := doc.GetData(map[string]string{"h1": "h1"})
     if textOne, ok := texts["h1"]; ok {
         for _, text := range textOne {
+            fmt.Println(text)
+        }
+    }
+    // get all urls from links
+    if links, ok := texts["links"]; ok {
+        for _, text := range links {
             fmt.Println(text)
         }
     }
@@ -95,6 +101,7 @@ Last blog posts:
     html2data https://blog.golang.org/ h3
 
 Getting RSS URL:
+
     html2data https://blog.golang.org/ 'link[type="application/atom+xml"]:attr(href)'
 
 See also

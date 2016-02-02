@@ -9,6 +9,16 @@ Install package only:
 
 	go get -u github.com/msoap/html2data
 
+Allowed pseudo-selectors:
+
+  * `:attr(attr_name)` - for getting attributes instead text
+
+Command line utility:
+
+    html2data URL "css selector"
+    html2data file.html "css selector"
+    cat file.html | html2data "css selector"
+
 */
 package html2data
 
@@ -30,7 +40,7 @@ type Doc struct {
 	Err error
 }
 
-// GetData - extract data by CSS selectors
+// GetData - extract data by CSS-selectors
 //  texts, err := doc.GetData(map[string]string{"h1": "h1"})
 func (doc Doc) GetData(selectors map[string]string) (result map[string][]string, err error) {
 	if doc.Err != nil {
@@ -78,7 +88,7 @@ func parseSelector(inputSelector string) (outSelector string, attrName string, e
 	return outSelector, attrName, nil
 }
 
-// GetDataSingle - extract data by CSS selector
+// GetDataSingle - extract data by one CSS-selector
 //  title, err := doc.GetDataSingle("title")
 func (doc Doc) GetDataSingle(selector string) (result string, err error) {
 	if doc.Err != nil {
