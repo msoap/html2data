@@ -26,6 +26,11 @@ Methods
   * `doc.GetData(map[string]string)` - get texts by CSS selectors
   * `doc.GetDataSingle(string)` - get text by one CSS selector
 
+Pseudo-selectors
+----------------
+
+  * `:attr(attr_name)` - getting attribute instead text, for example getting urls from links: `a:attr(href)`
+
 Example
 -------
 
@@ -62,7 +67,6 @@ func main() {
 TODO
 ----
 
-  * get tag attributes
   * html2data: get by several selectors
   * html2data: get JSON
 
@@ -89,6 +93,9 @@ Get title of page:
 Last blog posts:
 
     html2data https://blog.golang.org/ h3
+
+Getting RSS URL:
+    html2data https://blog.golang.org/ 'link[type="application/atom+xml"]:attr(href)'
 
 See also
 --------

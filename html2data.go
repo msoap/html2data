@@ -18,6 +18,8 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -37,14 +39,43 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 	result = map[string][]string{}
 	for name, selector := range selectors {
+		selector, attrName, err := parseSelector(selector)
+		if err != nil {
+			return result, err
+		}
+
 		texts := []string{}
 		doc.doc.Find(selector).Each(func(i int, selection *goquery.Selection) {
-			texts = append(texts, selection.Text())
+			if attrName != "" {
+				texts = append(texts, selection.AttrOr(attrName, ""))
+			} else {
+				texts = append(texts, selection.Text())
+			}
 		})
 		result[name] = texts
 	}
 
 	return result, err
+}
+
+// parseSelector - parse pseudo-selectors:
+// :attr(href) - for getting attribute instead text node
+func parseSelector(inputSelector string) (outSelector string, attrName string, err error) {
+	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*\(\s*(\w+)\s*\)\s*$`)
+
+	parts := strings.Split(inputSelector, ":")
+	outSelector, parts = parts[0], parts[1:]
+	for _, part := range parts {
+		reParts := htmlAttrRe.FindStringSubmatch(part)
+		switch {
+		case len(reParts) == 3 && reParts[1] == "attr":
+			attrName = reParts[2]
+		default:
+			return outSelector, attrName, fmt.Errorf("pseudo-selector is invalid: %s", part)
+		}
+	}
+
+	return outSelector, attrName, nil
 }
 
 // GetDataSingle - extract data by CSS selector

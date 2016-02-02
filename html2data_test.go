@@ -1,6 +1,7 @@
 package html2data
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -20,6 +21,14 @@ func Test_GetDataSingle(t *testing.T) {
 			"one<h1>head</h1>two<h1>head2</h1>",
 			"h1",
 			"head",
+		}, {
+			"one<h1>head</h1>two<h1 id=2>head2</h1>",
+			"h1#2",
+			"head2",
+		}, {
+			"one<h1>head</h1>two<a href='http://url'>link</a><h1>head2</h1>",
+			"a:attr(href)",
+			"http://url",
 		},
 	}
 
@@ -64,6 +73,61 @@ func Test_GetData(t *testing.T) {
 
 		if !reflect.DeepEqual(item.out, out) {
 			t.Errorf("expected: %#v, real: %#v", item.out, out)
+		}
+	}
+}
+
+func Test_parseSelector(t *testing.T) {
+	testData := []struct {
+		inSelector  string
+		outSelector string
+		attrName    string
+		err         error
+	}{
+		{
+			"div",
+			"div",
+			"",
+			nil,
+		}, {
+			"div:attr(href)",
+			"div",
+			"href",
+			nil,
+		}, {
+			"div: attr ( href ) ",
+			"div",
+			"href",
+			nil,
+		}, {
+			"div#1: attr ( href ) ",
+			"div#1",
+			"href",
+			nil,
+		}, {
+			"div#1:",
+			"div#1",
+			"",
+			fmt.Errorf(""),
+		}, {
+			"div:fail",
+			"div",
+			"",
+			fmt.Errorf(""),
+		},
+	}
+
+	for _, item := range testData {
+		outSelector, attrName, err := parseSelector(item.inSelector)
+
+		if outSelector != item.outSelector ||
+			attrName != item.attrName ||
+			(err == nil && item.err != nil) ||
+			(err != nil && item.err == nil) {
+			t.Errorf("For: %s\nexpected: %s, %s (%s)\nreal: %s, %s (%s)",
+				item.inSelector, item.outSelector, item.attrName,
+				item.err, outSelector, attrName, err,
+			)
 		}
 	}
 }
