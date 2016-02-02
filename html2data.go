@@ -51,10 +51,7 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 	result = map[string][]string{}
 	for name, selector := range selectors {
-		selector, attrName, getHTML, err := parseSelector(selector)
-		if err != nil {
-			return result, err
-		}
+		selector, attrName, getHTML := parseSelector(selector)
 
 		texts := []string{}
 		doc.doc.Find(selector).Each(func(i int, selection *goquery.Selection) {
@@ -78,7 +75,7 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 // parseSelector - parse pseudo-selectors:
 // :attr(href) - for getting attribute instead text node
-func parseSelector(inputSelector string) (outSelector string, attrName string, getHTML bool, err error) {
+func parseSelector(inputSelector string) (outSelector string, attrName string, getHTML bool) {
 	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*(?:\(\s*(\w+)\s*\))?\s*$`)
 
 	parts := strings.Split(inputSelector, ":")
@@ -91,11 +88,11 @@ func parseSelector(inputSelector string) (outSelector string, attrName string, g
 		case len(reParts) == 3 && reParts[1] == "html":
 			getHTML = true
 		default:
-			return outSelector, attrName, getHTML, fmt.Errorf("pseudo-selector is invalid: %s", part)
+			outSelector += ":" + part
 		}
 	}
 
-	return outSelector, attrName, getHTML, nil
+	return outSelector, attrName, getHTML
 }
 
 // GetDataSingle - extract data by one CSS-selector

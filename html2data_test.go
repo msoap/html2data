@@ -1,7 +1,6 @@
 package html2data
 
 import (
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -87,65 +86,55 @@ func Test_parseSelector(t *testing.T) {
 		outSelector string
 		attrName    string
 		getHTML     bool
-		err         error
 	}{
 		{
 			"div",
 			"div",
 			"",
 			false,
-			nil,
 		}, {
 			"div:attr(href)",
 			"div",
 			"href",
 			false,
-			nil,
 		}, {
 			"div: attr ( href ) ",
 			"div",
 			"href",
 			false,
-			nil,
 		}, {
 			"div#1: attr ( href ) ",
 			"div#1",
 			"href",
 			false,
-			nil,
 		}, {
 			"div#1:html",
 			"div#1",
 			"",
 			true,
-			nil,
 		}, {
-			"div#1:",
+			"div#1",
 			"div#1",
 			"",
 			false,
-			fmt.Errorf(""),
 		}, {
-			"div:fail",
-			"div",
-			"",
+			"div:nth-child(1):attr(href)",
+			"div:nth-child(1)",
+			"href",
 			false,
-			fmt.Errorf(""),
 		},
 	}
 
 	for _, item := range testData {
-		outSelector, attrName, getHTML, err := parseSelector(item.inSelector)
+		outSelector, attrName, getHTML := parseSelector(item.inSelector)
 
 		if outSelector != item.outSelector ||
 			attrName != item.attrName ||
-			getHTML != item.getHTML ||
-			(err == nil && item.err != nil) ||
-			(err != nil && item.err == nil) {
-			t.Errorf("For: %s\nexpected: %s, %s, %s (%s)\nreal: %s, %s %s, (%s)",
+			getHTML != item.getHTML {
+			t.Errorf("For: %s\nexpected: %s, %s, %s\nreal: %s, %s, %s",
 				item.inSelector,
-				item.outSelector, item.attrName, item.getHTML, item.err,
-				outSelector, attrName, getHTML, err,
+				item.outSelector, item.attrName, item.getHTML,
+				outSelector, attrName, getHTML,
 			)
 		}
 	}
