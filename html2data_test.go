@@ -26,6 +26,10 @@ func Test_GetDataSingle(t *testing.T) {
 			"h1#2",
 			"head2",
 		}, {
+			"one<div><h1>head</h1>two</div><h1 id=2>head2</h1>",
+			"div:html",
+			"<h1>head</h1>two",
+		}, {
 			"one<h1>head</h1>two<a href='http://url'>link</a><h1>head2</h1>",
 			"a:attr(href)",
 			"http://url",
@@ -82,51 +86,66 @@ func Test_parseSelector(t *testing.T) {
 		inSelector  string
 		outSelector string
 		attrName    string
+		getHTML     bool
 		err         error
 	}{
 		{
 			"div",
 			"div",
 			"",
+			false,
 			nil,
 		}, {
 			"div:attr(href)",
 			"div",
 			"href",
+			false,
 			nil,
 		}, {
 			"div: attr ( href ) ",
 			"div",
 			"href",
+			false,
 			nil,
 		}, {
 			"div#1: attr ( href ) ",
 			"div#1",
 			"href",
+			false,
+			nil,
+		}, {
+			"div#1:html",
+			"div#1",
+			"",
+			true,
 			nil,
 		}, {
 			"div#1:",
 			"div#1",
 			"",
+			false,
 			fmt.Errorf(""),
 		}, {
 			"div:fail",
 			"div",
 			"",
+			false,
 			fmt.Errorf(""),
 		},
 	}
 
 	for _, item := range testData {
-		outSelector, attrName, err := parseSelector(item.inSelector)
+		outSelector, attrName, getHTML, err := parseSelector(item.inSelector)
 
 		if outSelector != item.outSelector ||
 			attrName != item.attrName ||
+			getHTML != item.getHTML ||
 			(err == nil && item.err != nil) ||
 			(err != nil && item.err == nil) {
-			t.Errorf("For: %s\nexpected: %s, %s (%s)\nreal: %s, %s (%s)",
-				item.inSelector, item.outSelector, item.attrName,
-				item.err, outSelector, attrName, err,
+			t.Errorf("For: %s\nexpected: %s, %s, %s (%s)\nreal: %s, %s %s, (%s)",
+				item.inSelector,
+				item.outSelector, item.attrName, item.getHTML, item.err,
+				outSelector, attrName, getHTML, err,
 			)
 		}
 	}

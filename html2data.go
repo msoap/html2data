@@ -11,7 +11,8 @@ Install package only:
 
 Allowed pseudo-selectors:
 
-  * `:attr(attr_name)` - for getting attributes instead text
+ * `:attr(attr_name)` - for getting attributes instead text
+ * `:html` - for getting HTML instead text
 
 Command line utility:
 
@@ -49,7 +50,7 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 	result = map[string][]string{}
 	for name, selector := range selectors {
-		selector, attrName, err := parseSelector(selector)
+		selector, attrName, getHTML, err := parseSelector(selector)
 		if err != nil {
 			return result, err
 		}
@@ -58,6 +59,12 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 		doc.doc.Find(selector).Each(func(i int, selection *goquery.Selection) {
 			if attrName != "" {
 				texts = append(texts, selection.AttrOr(attrName, ""))
+			} else if getHTML {
+				HTML, err := selection.Html()
+				if err != nil {
+					return
+				}
+				texts = append(texts, HTML)
 			} else {
 				texts = append(texts, selection.Text())
 			}
@@ -70,8 +77,8 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 // parseSelector - parse pseudo-selectors:
 // :attr(href) - for getting attribute instead text node
-func parseSelector(inputSelector string) (outSelector string, attrName string, err error) {
-	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*\(\s*(\w+)\s*\)\s*$`)
+func parseSelector(inputSelector string) (outSelector string, attrName string, getHTML bool, err error) {
+	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*(?:\(\s*(\w+)\s*\))?\s*$`)
 
 	parts := strings.Split(inputSelector, ":")
 	outSelector, parts = parts[0], parts[1:]
@@ -80,12 +87,14 @@ func parseSelector(inputSelector string) (outSelector string, attrName string, e
 		switch {
 		case len(reParts) == 3 && reParts[1] == "attr":
 			attrName = reParts[2]
+		case len(reParts) == 3 && reParts[1] == "html":
+			getHTML = true
 		default:
-			return outSelector, attrName, fmt.Errorf("pseudo-selector is invalid: %s", part)
+			return outSelector, attrName, getHTML, fmt.Errorf("pseudo-selector is invalid: %s", part)
 		}
 	}
 
-	return outSelector, attrName, nil
+	return outSelector, attrName, getHTML, nil
 }
 
 // GetDataSingle - extract data by one CSS-selector
