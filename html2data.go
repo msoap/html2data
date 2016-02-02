@@ -11,8 +11,9 @@ Install package only:
 
 Allowed pseudo-selectors:
 
- * `:attr(attr_name)` - for getting attributes instead text
- * `:html` - for getting HTML instead text
+`:attr(attr_name)` - for getting attributes instead text
+
+`:html` - for getting HTML instead text
 
 Command line utility:
 
