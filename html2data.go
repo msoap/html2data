@@ -15,6 +15,8 @@ Allowed pseudo-selectors:
 
 `:html` - for getting HTML instead text
 
+`:get(N)` - get n-th element from list
+
 Command line utility:
 
     html2data URL "css selector"
@@ -31,6 +33,7 @@ import (
 	"net/http/cookiejar"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -42,6 +45,14 @@ type Doc struct {
 	Err error
 }
 
+// Selector - selector with settings
+type Selector struct {
+	selector string
+	attrName string
+	getHTML  bool
+	getNth   int
+}
+
 // GetData - extract data by CSS-selectors
 //  texts, err := doc.GetData(map[string]string{"h1": "h1"})
 func (doc Doc) GetData(selectors map[string]string) (result map[string][]string, err error) {
@@ -50,14 +61,18 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 	}
 
 	result = map[string][]string{}
-	for name, selector := range selectors {
-		selector, attrName, getHTML := parseSelector(selector)
+	for name, selectorRaw := range selectors {
+		selector := parseSelector(selectorRaw)
 
 		texts := []string{}
-		doc.doc.Find(selector).Each(func(i int, selection *goquery.Selection) {
-			if attrName != "" {
-				texts = append(texts, selection.AttrOr(attrName, ""))
-			} else if getHTML {
+		doc.doc.Find(selector.selector).Each(func(i int, selection *goquery.Selection) {
+			if selector.getNth > 0 && selector.getNth != i+1 {
+				return
+			}
+
+			if selector.attrName != "" {
+				texts = append(texts, selection.AttrOr(selector.attrName, ""))
+			} else if selector.getHTML {
 				HTML, err := selection.Html()
 				if err != nil {
 					return
@@ -75,24 +90,26 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 // parseSelector - parse pseudo-selectors:
 // :attr(href) - for getting attribute instead text node
-func parseSelector(inputSelector string) (outSelector string, attrName string, getHTML bool) {
+func parseSelector(inputSelector string) (outSelector Selector) {
 	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*(?:\(\s*(\w+)\s*\))?\s*$`)
 
 	parts := strings.Split(inputSelector, ":")
-	outSelector, parts = parts[0], parts[1:]
+	outSelector.selector, parts = parts[0], parts[1:]
 	for _, part := range parts {
 		reParts := htmlAttrRe.FindStringSubmatch(part)
 		switch {
 		case len(reParts) == 3 && reParts[1] == "attr":
-			attrName = reParts[2]
+			outSelector.attrName = reParts[2]
 		case len(reParts) == 3 && reParts[1] == "html":
-			getHTML = true
+			outSelector.getHTML = true
+		case len(reParts) == 3 && reParts[1] == "get":
+			outSelector.getNth, _ = strconv.Atoi(reParts[2])
 		default:
-			outSelector += ":" + part
+			outSelector.selector += ":" + part
 		}
 	}
 
-	return outSelector, attrName, getHTML
+	return outSelector
 }
 
 // GetDataSingle - extract data by one CSS-selector

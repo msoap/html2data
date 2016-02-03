@@ -1,6 +1,7 @@
 package html2data
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -32,6 +33,10 @@ func Test_GetDataSingle(t *testing.T) {
 			"one<h1>head</h1>two<a href='http://url'>link</a><h1>head2</h1>",
 			"a:attr(href)",
 			"http://url",
+		}, {
+			"one<h1>head1</h1>two<a href='http://url'>link</a><h1>head2</h1>",
+			"h1:get(2)",
+			"head2",
 		},
 	}
 
@@ -83,58 +88,85 @@ func Test_GetData(t *testing.T) {
 func Test_parseSelector(t *testing.T) {
 	testData := []struct {
 		inSelector  string
-		outSelector string
-		attrName    string
-		getHTML     bool
+		outSelector Selector
 	}{
 		{
 			"div",
-			"div",
-			"",
-			false,
+			Selector{
+				"div",
+				"",
+				false,
+				0,
+			},
 		}, {
 			"div:attr(href)",
-			"div",
-			"href",
-			false,
+			Selector{
+				"div",
+				"href",
+				false,
+				0,
+			},
 		}, {
 			"div: attr ( href ) ",
-			"div",
-			"href",
-			false,
+			Selector{
+				"div",
+				"href",
+				false,
+				0,
+			},
 		}, {
 			"div#1: attr ( href ) ",
-			"div#1",
-			"href",
-			false,
+			Selector{
+				"div#1",
+				"href",
+				false,
+				0,
+			},
 		}, {
 			"div#1:html",
-			"div#1",
-			"",
-			true,
+			Selector{
+				"div#1",
+				"",
+				true,
+				0,
+			},
 		}, {
 			"div#1",
-			"div#1",
-			"",
-			false,
+			Selector{
+				"div#1",
+				"",
+				false,
+				0,
+			},
 		}, {
 			"div:nth-child(1):attr(href)",
-			"div:nth-child(1)",
-			"href",
-			false,
+			Selector{
+				"div:nth-child(1)",
+				"href",
+				false,
+				0,
+			},
+		}, {
+			"div:nth-child(1):get(3)",
+			Selector{
+				"div:nth-child(1)",
+				"",
+				false,
+				3,
+			},
 		},
 	}
 
 	for _, item := range testData {
-		outSelector, attrName, getHTML := parseSelector(item.inSelector)
+		outSelector := parseSelector(item.inSelector)
+		inString := fmt.Sprintf("%#v", item.outSelector)
+		outString := fmt.Sprintf("%#v", outSelector)
 
-		if outSelector != item.outSelector ||
-			attrName != item.attrName ||
-			getHTML != item.getHTML {
-			t.Errorf("For: %s\nexpected: %s, %s, %s\nreal: %s, %s, %s",
+		if inString != outString {
+			t.Errorf("For: %s\nexpected: %s\nreal: %s",
 				item.inSelector,
-				item.outSelector, item.attrName, item.getHTML,
-				outSelector, attrName, getHTML,
+				inString,
+				outString,
 			)
 		}
 	}

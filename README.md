@@ -31,6 +31,7 @@ Pseudo-selectors
 
   * `:attr(attr_name)` - getting attribute instead text, for example getting urls from links: `a:attr(href)`
   * `:html` - getting HTML instead text
+  * `:get(N)` - get n-th element from list
 
 Example
 -------
