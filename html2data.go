@@ -46,7 +46,7 @@ type Doc struct {
 }
 
 // Selector - selector with settings
-type Selector struct {
+type CSSSelector struct {
 	selector string
 	attrName string
 	getHTML  bool
@@ -90,7 +90,7 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 
 // parseSelector - parse pseudo-selectors:
 // :attr(href) - for getting attribute instead text node
-func parseSelector(inputSelector string) (outSelector Selector) {
+func parseSelector(inputSelector string) (outSelector CSSSelector) {
 	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*(?:\(\s*(\w+)\s*\))?\s*$`)
 
 	parts := strings.Split(inputSelector, ":")

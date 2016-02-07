@@ -88,11 +88,11 @@ func Test_GetData(t *testing.T) {
 func Test_parseSelector(t *testing.T) {
 	testData := []struct {
 		inSelector  string
-		outSelector Selector
+		outSelector CSSSelector
 	}{
 		{
 			"div",
-			Selector{
+			CSSSelector{
 				"div",
 				"",
 				false,
@@ -100,7 +100,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div:attr(href)",
-			Selector{
+			CSSSelector{
 				"div",
 				"href",
 				false,
@@ -108,7 +108,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div: attr ( href ) ",
-			Selector{
+			CSSSelector{
 				"div",
 				"href",
 				false,
@@ -116,7 +116,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div#1: attr ( href ) ",
-			Selector{
+			CSSSelector{
 				"div#1",
 				"href",
 				false,
@@ -124,7 +124,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div#1:html",
-			Selector{
+			CSSSelector{
 				"div#1",
 				"",
 				true,
@@ -132,7 +132,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div#1",
-			Selector{
+			CSSSelector{
 				"div#1",
 				"",
 				false,
@@ -140,7 +140,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div:nth-child(1):attr(href)",
-			Selector{
+			CSSSelector{
 				"div:nth-child(1)",
 				"href",
 				false,
@@ -148,7 +148,7 @@ func Test_parseSelector(t *testing.T) {
 			},
 		}, {
 			"div:nth-child(1):get(3)",
-			Selector{
+			CSSSelector{
 				"div:nth-child(1)",
 				"",
 				false,
