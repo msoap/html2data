@@ -123,6 +123,25 @@ func (doc Doc) GetData(selectors map[string]string) (result map[string][]string,
 	return result, err
 }
 
+// GetDataNested - extract nested data by CSS-selectors from another CSS-selector
+//  texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
+func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string) (result []map[string][]string, err error) {
+	selector := parseSelector(selectorRaw)
+	doc.doc.Find(selector.selector).Each(func(i int, selection *goquery.Selection) {
+		if selector.getNth > 0 && selector.getNth != i+1 {
+			return
+		}
+
+		nestedResult, nestedErr := doc.getDataFromDocOrSelection(selection, nestedSelectors)
+		if nestedErr != nil {
+			err = nestedErr
+		}
+
+		result = append(result, nestedResult)
+	})
+	return result, err
+}
+
 // GetDataSingle - extract data by one CSS-selector
 //  title, err := doc.GetDataSingle("title")
 func (doc Doc) GetDataSingle(selector string) (result string, err error) {

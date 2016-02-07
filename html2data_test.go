@@ -85,6 +85,59 @@ func Test_GetData(t *testing.T) {
 	}
 }
 
+func Test_GetDataNested(t *testing.T) {
+	testData := []struct {
+		html     string
+		outerCss string
+		css      map[string]string
+		out      []map[string][]string
+	}{
+		{
+			"<div>one<h1>head</h1>two</div> <h1>head two</h1>",
+			"div",
+			map[string]string{"h1": "h1"},
+			[]map[string][]string{{"h1": {"head"}}},
+		},
+		{
+			"<div>one<h1>head</h1>two</div> <div><h1>head two</h1><div>",
+			"div:get(1)",
+			map[string]string{"h1": "h1"},
+			[]map[string][]string{{"h1": {"head"}}},
+		},
+		{
+			"<div>one<a href=url1>head</a>two</div> <div><a href=url2>head two</h1><div> <a href=url3>l3</a>",
+			"div:get(1)",
+			map[string]string{"urls": "a:attr(href)"},
+			[]map[string][]string{{"urls": {"url1"}}},
+		},
+		{
+			"<div>one<a href=url1>head</a>two</div> <div><a href=url2>head two</h1><div>",
+			"div:get(2)",
+			map[string]string{"urls": "a:attr(href)"},
+			[]map[string][]string{{"urls": {"url2"}}},
+		},
+		{
+			"<div class=cl>one<a href=url1>head</a>two<a href=url1.1>h1.1</a></div> <div><a href=url2>head two</a></div> <div class=cl><a href=url3>l3</a> </div>",
+			"div.cl",
+			map[string]string{"urls": "a:attr(href)"},
+			[]map[string][]string{{"urls": {"url1", "url1.1"}}, {"urls": {"url3"}}},
+		},
+	}
+
+	for _, item := range testData {
+		reader := strings.NewReader(item.html)
+		out, err := FromReader(reader).GetDataNested(item.outerCss, item.css)
+
+		if err != nil {
+			t.Errorf("Got error: %s", err)
+		}
+
+		if !reflect.DeepEqual(item.out, out) {
+			t.Errorf("\nhtml: %s\ncss: %s\nexpected: %#v\nreal    : %#v", item.html, item.css, item.out, out)
+		}
+	}
+}
+
 func Test_parseSelector(t *testing.T) {
 	testData := []struct {
 		inSelector  string
