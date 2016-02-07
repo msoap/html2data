@@ -4,7 +4,7 @@ html2data
 [![GoDoc](https://godoc.org/github.com/msoap/html2data?status.svg)](https://godoc.org/github.com/msoap/html2data)
 [![Build Status](https://travis-ci.org/msoap/html2data.svg?branch=master)](https://travis-ci.org/msoap/html2data)
 [![Coverage](https://gocover.io/_badge/github.com/msoap/html2data?1)](https://gocover.io/github.com/msoap/html2data)
-[![Report Card](http://goreportcard.com/badge/msoap/html2data)](http://goreportcard.com/report/msoap/html2data)
+[![Report Card](http://goreportcard.com/badge/github.com/msoap/html2data)](https://goreportcard.com/report/github.com/msoap/html2data)
 
 Extract data from HTML via CSS selectors
 
