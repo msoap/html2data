@@ -4,7 +4,7 @@ html2data
 [![GoDoc](https://godoc.org/github.com/msoap/html2data?status.svg)](https://godoc.org/github.com/msoap/html2data)
 [![Build Status](https://travis-ci.org/msoap/html2data.svg?branch=master)](https://travis-ci.org/msoap/html2data)
 [![Coverage](https://gocover.io/_badge/github.com/msoap/html2data)](https://gocover.io/github.com/msoap/html2data)
-[![Report Card](http://goreportcard.com/badge/github.com/msoap/html2data)](https://goreportcard.com/report/github.com/msoap/html2data)
+[![Report Card](https://goreportcard.com/badge/github.com/msoap/html2data)](https://goreportcard.com/report/github.com/msoap/html2data)
 
 Extract data from HTML via CSS selectors
 
@@ -26,6 +26,7 @@ Methods
   * `FromURL(URL)` - create document from http(s) URL
   * `FromFile(file)` - create document from local file
   * `doc.GetData(map[string]string)` - get texts by CSS selectors
+  * `doc.GetDataNested(outerCss string, map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
   * `doc.GetDataSingle(string)` - get text by one CSS selector
 
 Pseudo-selectors
