@@ -174,9 +174,20 @@ func FromFile(fileName string) Doc {
 	return FromReader(fileReader)
 }
 
+// Cfg - config for FromURL()
+type Cfg struct {
+	UA string // custom user-agent
+}
+
 // FromURL - get doc from URL
-func FromURL(URL string) Doc {
-	httpResponse, err := getHTMLPage(URL)
+// FromURL("https://url")
+// FromURL("https://url", html2data.Cfg{UA: "Custom UA 1.0"})
+func FromURL(URL string, config ...Cfg) Doc {
+	ua := ""
+	if len(config) > 0 {
+		ua = config[0].UA
+	}
+	httpResponse, err := getHTMLPage(URL, ua)
 	if err != nil {
 		return Doc{Err: err}
 	}
@@ -185,12 +196,25 @@ func FromURL(URL string) Doc {
 }
 
 // getHTMLPage - get html by http(s) as http.Response
-func getHTMLPage(url string) (response *http.Response, err error) {
+func getHTMLPage(url string, ua string) (response *http.Response, err error) {
 	cookie, _ := cookiejar.New(nil)
 	client := &http.Client{
 		Jar: cookie,
 	}
 
-	response, err = client.Get(url)
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return response, err
+	}
+
+	if ua != "" {
+		request.Header.Set("User-Agent", ua)
+	}
+
+	response, err = client.Do(request)
+	if err != nil {
+		return response, err
+	}
+
 	return response, err
 }
