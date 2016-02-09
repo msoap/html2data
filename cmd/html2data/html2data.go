@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -10,16 +11,26 @@ import (
 	"github.com/msoap/html2data"
 )
 
-const usageString = "Usage: html2data [url|file|-] 'css selector'"
+const usageString = "Usage: html2data [options] [url|file|-] 'css selector'"
 
 func main() {
+	userAgent := ""
+	flag.StringVar(&userAgent, "user-agent", "", "set custom user-agent")
+	flag.Usage = func() {
+		fmt.Println(usageString)
+		flag.PrintDefaults()
+		os.Exit(0)
+	}
+	flag.Parse()
+
 	url, CSSSelector := "", ""
-	if len(os.Args) == 3 {
+	args := flag.Args()
+	if len(args) == 2 {
 		// url and css selector
-		url, CSSSelector = os.Args[1], os.Args[2]
-	} else if len(os.Args) == 2 {
+		url, CSSSelector = args[0], args[1]
+	} else if len(args) == 1 {
 		// css selector
-		CSSSelector = os.Args[1]
+		CSSSelector = args[0]
 	} else {
 		fmt.Println(usageString)
 		return
@@ -33,7 +44,7 @@ func main() {
 		reader := bufio.NewReader(os.Stdin)
 		doc = html2data.FromReader(reader)
 	} else if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
-		doc = html2data.FromURL(url)
+		doc = html2data.FromURL(url, html2data.Cfg{UA: userAgent})
 	} else if len(url) > 0 {
 		doc = html2data.FromFile(url)
 	} else {
