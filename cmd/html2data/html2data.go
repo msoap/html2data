@@ -14,8 +14,9 @@ import (
 const usageString = "Usage: html2data [options] [url|file|-] 'css selector'"
 
 func main() {
-	userAgent := ""
+	userAgent, outerCSS := "", ""
 	flag.StringVar(&userAgent, "user-agent", "", "set custom user-agent")
+	flag.StringVar(&outerCSS, "find-in", "", "search in the specified elements instead document")
 	flag.Usage = func() {
 		fmt.Println(usageString)
 		flag.PrintDefaults()
@@ -36,7 +37,6 @@ func main() {
 		return
 	}
 
-	var err error
 	var doc html2data.Doc
 	stat, _ := os.Stdin.Stat()
 
@@ -52,14 +52,28 @@ func main() {
 		return
 	}
 
-	texts, err := doc.GetData(map[string]string{"one": CSSSelector})
-	if err != nil {
-		log.Fatal(err)
-	}
+	if outerCSS != "" {
+		texts, err := doc.GetDataNested(outerCSS, map[string]string{"one": CSSSelector})
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, outerPart := range texts {
+			if textOne, ok := outerPart["one"]; ok {
+				for _, text := range textOne {
+					fmt.Println(text)
+				}
+			}
+		}
+	} else {
+		texts, err := doc.GetData(map[string]string{"one": CSSSelector})
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	if textOne, ok := texts["one"]; ok {
-		for _, text := range textOne {
-			fmt.Println(text)
+		if textOne, ok := texts["one"]; ok {
+			for _, text := range textOne {
+				fmt.Println(text)
+			}
 		}
 	}
 }

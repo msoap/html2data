@@ -92,6 +92,7 @@ Command line utility
 ### Options
 
   * `-user-agent="Custom UA"` -- set custom user-agent
+  * `-find-in="outer.css.selector"` -- search in the specified elements instead document
 
 ### TODO: install from homebrew
 
