@@ -85,9 +85,13 @@ TODO
 Command line utility
 --------------------
 
-    html2data URL "css selector"
-    html2data file.html "css selector"
+    html2data [options] URL "css selector"
+    html2data [options] file.html "css selector"
     cat file.html | html2data "css selector"
+
+### Options
+
+  * `-user-agent="Custom UA"` -- set custom user-agent
 
 ### TODO: install from homebrew
 
