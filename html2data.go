@@ -50,7 +50,7 @@ type Doc struct {
 	Err error
 }
 
-// Selector - selector with settings
+// CSSSelector - selector with settings
 type CSSSelector struct {
 	selector string
 	attrName string

@@ -88,7 +88,7 @@ func Test_GetData(t *testing.T) {
 func Test_GetDataNested(t *testing.T) {
 	testData := []struct {
 		html     string
-		outerCss string
+		outerCSS string
 		css      map[string]string
 		out      []map[string][]string
 	}{
@@ -126,7 +126,7 @@ func Test_GetDataNested(t *testing.T) {
 
 	for _, item := range testData {
 		reader := strings.NewReader(item.html)
-		out, err := FromReader(reader).GetDataNested(item.outerCss, item.css)
+		out, err := FromReader(reader).GetDataNested(item.outerCSS, item.css)
 
 		if err != nil {
 			t.Errorf("Got error: %s", err)
