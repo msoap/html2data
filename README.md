@@ -79,13 +79,13 @@ func main() {
 TODO
 ----
 
-  * html2data: get by several selectors
   * html2data: get JSON
 
 Command line utility
 --------------------
 
     html2data [options] URL "css selector"
+    html2data [options] URL :name1 "css1" :name2 "css2"...
     html2data [options] file.html "css selector"
     cat file.html | html2data "css selector"
 

@@ -11,10 +11,12 @@ import (
 	"github.com/msoap/html2data"
 )
 
-const usageString = "Usage: html2data [options] [url|file|-] 'css selector'"
+const usageString = "Usage:\n" +
+	"  html2data [options] [url|file|-] 'css selector'\n" +
+	"  html2data [options] [url|file|-] :name 'css1' :name2 'css2' ...\n\n" +
+	"options:"
 
-func main() {
-	userAgent, outerCSS := "", ""
+func getConfig() (userAgent, outerCSS, url string, CSSSelectors map[string]string) {
 	flag.StringVar(&userAgent, "user-agent", "", "set custom user-agent")
 	flag.StringVar(&outerCSS, "find-in", "", "search in the specified elements instead document")
 	flag.Usage = func() {
@@ -24,21 +26,20 @@ func main() {
 	}
 	flag.Parse()
 
-	url, CSSSelector := "", ""
-	args := flag.Args()
-	if len(args) == 2 {
-		// url and css selector
-		url, CSSSelector = args[0], args[1]
-	} else if len(args) == 1 {
-		// css selector
-		CSSSelector = args[0]
-	} else {
-		fmt.Println(usageString)
-		return
+	url, CSSSelectors, err := parseArgs(flag.Args())
+	if err != nil {
+		log.Fatal(err)
 	}
+	return userAgent, outerCSS, url, CSSSelectors
+}
 
+func main() {
+	userAgent, outerCSS, url, CSSSelectors := getConfig()
 	var doc html2data.Doc
-	stat, _ := os.Stdin.Stat()
+	stat, err := os.Stdin.Stat()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if url == "-" || (stat.Mode()&os.ModeCharDevice) == 0 {
 		reader := bufio.NewReader(os.Stdin)
@@ -53,25 +54,33 @@ func main() {
 	}
 
 	if outerCSS != "" {
-		texts, err := doc.GetDataNested(outerCSS, map[string]string{"one": CSSSelector})
+		textsOuter, err := doc.GetDataNested(outerCSS, CSSSelectors)
 		if err != nil {
 			log.Fatal(err)
 		}
-		for _, outerPart := range texts {
-			if textOne, ok := outerPart["one"]; ok {
-				for _, text := range textOne {
+
+		for i, texts := range textsOuter {
+			fmt.Printf("%d:\n", i)
+			for name, value := range texts {
+				if len(CSSSelectors) > 1 {
+					fmt.Print(name + ":\t")
+				}
+				for _, text := range value {
 					fmt.Println(text)
 				}
 			}
 		}
 	} else {
-		texts, err := doc.GetData(map[string]string{"one": CSSSelector})
+		texts, err := doc.GetData(CSSSelectors)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if textOne, ok := texts["one"]; ok {
-			for _, text := range textOne {
+		for name, value := range texts {
+			if len(CSSSelectors) > 1 {
+				fmt.Print(name + ":\t")
+			}
+			for _, text := range value {
 				fmt.Println(text)
 			}
 		}
