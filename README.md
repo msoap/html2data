@@ -115,6 +115,8 @@ Getting RSS URL:
 
     html2data https://blog.golang.org/ 'link[type="application/atom+xml"]:attr(href)'
 
+More examples from [wiki](https://github.com/msoap/html2data/wiki/Examples).
+
 See also
 --------
 
