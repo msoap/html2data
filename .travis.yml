@@ -21,4 +21,4 @@ script:
   - go test -coverprofile=cmd.coverprofile ./cmd/html2data
   - go test -coverprofile=main.coverprofile
   - $HOME/gopath/bin/gover
-  - $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci
+  - $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci || true
