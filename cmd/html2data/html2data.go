@@ -14,7 +14,7 @@ import (
 
 const usageString = "Usage:\n" +
 	"  html2data [options] [url|file|-] 'css selector'\n" +
-	"  html2data [options] [url|file|-] :name 'css1' :name2 'css2' ...\n\n" +
+	"  html2data [options] [url|file|-] :name1 'css1' :name2 'css2' ...\n\n" +
 	"options:"
 
 type cmdConfig struct {
