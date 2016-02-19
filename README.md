@@ -24,11 +24,11 @@ Methods
 -------
 
   * `FromReader(io.Reader)` - create document for parse
-  * `FromURL(URL)` - create document from http(s) URL
+  * `FromURL(URL, [config Cfg])` - create document from http(s) URL
   * `FromFile(file)` - create document from local file
   * `doc.GetData(map[string]string)` - get texts by CSS selectors
   * `doc.GetDataNested(outerCss string, map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
-  * `doc.GetDataSingle(string)` - get text by one CSS selector
+  * `doc.GetDataSingle(string)` - get one result by one CSS selector
 
 Pseudo-selectors
 ----------------
@@ -52,6 +52,8 @@ import (
 
 func main() {
     doc := html2data.FromURL("http://example.com")
+    // or with config
+    // doc := html2data.FromURL("http://example.com", html2data.Cfg{UA: "userAgent", TimeOut: 10})
     if doc.Err != nil {
         log.Fatal(doc.Err)
     }

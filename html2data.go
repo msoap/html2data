@@ -176,12 +176,14 @@ func FromFile(fileName string) Doc {
 
 // Cfg - config for FromURL()
 type Cfg struct {
-	UA string // custom user-agent
+	UA      string // custom user-agent
+	TimeOut int    // timeout in seconds
 }
 
 // FromURL - get doc from URL
+//
 // FromURL("https://url")
-// FromURL("https://url", html2data.Cfg{UA: "Custom UA 1.0"})
+// FromURL("https://url", Cfg{UA: "Custom UA 1.0", TimeOut: 10})
 func FromURL(URL string, config ...Cfg) Doc {
 	ua := ""
 	if len(config) > 0 {
