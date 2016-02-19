@@ -35,6 +35,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -185,11 +186,12 @@ type Cfg struct {
 // FromURL("https://url")
 // FromURL("https://url", Cfg{UA: "Custom UA 1.0", TimeOut: 10})
 func FromURL(URL string, config ...Cfg) Doc {
-	ua := ""
+	ua, timeout := "", 0
 	if len(config) > 0 {
 		ua = config[0].UA
+		timeout = config[0].TimeOut
 	}
-	httpResponse, err := getHTMLPage(URL, ua)
+	httpResponse, err := getHTMLPage(URL, ua, timeout)
 	if err != nil {
 		return Doc{Err: err}
 	}
@@ -198,10 +200,11 @@ func FromURL(URL string, config ...Cfg) Doc {
 }
 
 // getHTMLPage - get html by http(s) as http.Response
-func getHTMLPage(url string, ua string) (response *http.Response, err error) {
+func getHTMLPage(url string, ua string, timeout int) (response *http.Response, err error) {
 	cookie, _ := cookiejar.New(nil)
 	client := &http.Client{
-		Jar: cookie,
+		Jar:     cookie,
+		Timeout: time.Duration(time.Duration(timeout) * time.Second),
 	}
 
 	request, err := http.NewRequest("GET", url, nil)

@@ -91,6 +91,7 @@ Command line utility
   * `-user-agent="Custom UA"` -- set custom user-agent
   * `-find-in="outer.css.selector"` -- search in the specified elements instead document
   * `-json` -- get result as JSON
+  * `-timeout=10` -- setting timeout when loading the URL
 
 ### TODO: install from homebrew
 

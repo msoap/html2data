@@ -17,10 +17,17 @@ const usageString = "Usage:\n" +
 	"  html2data [options] [url|file|-] :name 'css1' :name2 'css2' ...\n\n" +
 	"options:"
 
-func getConfig() (userAgent, outerCSS, url string, getJSON bool, CSSSelectors map[string]string) {
-	flag.StringVar(&userAgent, "user-agent", "", "set custom user-agent")
-	flag.StringVar(&outerCSS, "find-in", "", "search in the specified elements instead document")
-	flag.BoolVar(&getJSON, "json", false, "JSON output")
+type cmdConfig struct {
+	userAgent, outerCSS, url string
+	getJSON                  bool
+	timeOut                  int
+}
+
+func getConfig() (config cmdConfig, CSSSelectors map[string]string) {
+	flag.StringVar(&config.userAgent, "user-agent", "", "set custom user-agent")
+	flag.StringVar(&config.outerCSS, "find-in", "", "search in the specified elements instead document")
+	flag.BoolVar(&config.getJSON, "json", false, "JSON output")
+	flag.IntVar(&config.timeOut, "timeout", 0, "timeout in seconds")
 	flag.Usage = func() {
 		fmt.Println(usageString)
 		flag.PrintDefaults()
@@ -28,11 +35,12 @@ func getConfig() (userAgent, outerCSS, url string, getJSON bool, CSSSelectors ma
 	}
 	flag.Parse()
 
-	url, CSSSelectors, err := parseArgs(flag.Args())
+	var err error
+	config.url, CSSSelectors, err = parseArgs(flag.Args())
 	if err != nil {
 		log.Fatal(err)
 	}
-	return userAgent, outerCSS, url, getJSON, CSSSelectors
+	return config, CSSSelectors
 }
 
 // printAsText - print result as text
@@ -48,32 +56,32 @@ func printAsText(texts map[string][]string, doPrintName bool) {
 }
 
 func main() {
-	userAgent, outerCSS, url, getJSON, CSSSelectors := getConfig()
+	config, CSSSelectors := getConfig()
 	var doc html2data.Doc
 	stat, err := os.Stdin.Stat()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if url == "-" || (stat.Mode()&os.ModeCharDevice) == 0 {
+	if config.url == "-" || (stat.Mode()&os.ModeCharDevice) == 0 {
 		reader := bufio.NewReader(os.Stdin)
 		doc = html2data.FromReader(reader)
-	} else if strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://") {
-		doc = html2data.FromURL(url, html2data.Cfg{UA: userAgent})
-	} else if len(url) > 0 {
-		doc = html2data.FromFile(url)
+	} else if strings.HasPrefix(config.url, "http://") || strings.HasPrefix(config.url, "https://") {
+		doc = html2data.FromURL(config.url, html2data.Cfg{UA: config.userAgent, TimeOut: config.timeOut})
+	} else if len(config.url) > 0 {
+		doc = html2data.FromFile(config.url)
 	} else {
 		fmt.Println(usageString)
 		return
 	}
 
-	if outerCSS != "" {
-		textsOuter, err := doc.GetDataNested(outerCSS, CSSSelectors)
+	if config.outerCSS != "" {
+		textsOuter, err := doc.GetDataNested(config.outerCSS, CSSSelectors)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		if getJSON {
+		if config.getJSON {
 			jsonObject := []map[string][]string{}
 			for _, texts := range textsOuter {
 				jsonObject = append(jsonObject, texts)
@@ -92,7 +100,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		if getJSON {
+		if config.getJSON {
 			json, _ := json.Marshal(texts)
 			fmt.Println(string(json))
 		} else {
