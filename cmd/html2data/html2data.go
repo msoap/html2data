@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
@@ -16,9 +17,10 @@ const usageString = "Usage:\n" +
 	"  html2data [options] [url|file|-] :name 'css1' :name2 'css2' ...\n\n" +
 	"options:"
 
-func getConfig() (userAgent, outerCSS, url string, CSSSelectors map[string]string) {
+func getConfig() (userAgent, outerCSS, url string, getJSON bool, CSSSelectors map[string]string) {
 	flag.StringVar(&userAgent, "user-agent", "", "set custom user-agent")
 	flag.StringVar(&outerCSS, "find-in", "", "search in the specified elements instead document")
+	flag.BoolVar(&getJSON, "json", false, "JSON output")
 	flag.Usage = func() {
 		fmt.Println(usageString)
 		flag.PrintDefaults()
@@ -30,11 +32,23 @@ func getConfig() (userAgent, outerCSS, url string, CSSSelectors map[string]strin
 	if err != nil {
 		log.Fatal(err)
 	}
-	return userAgent, outerCSS, url, CSSSelectors
+	return userAgent, outerCSS, url, getJSON, CSSSelectors
+}
+
+// printAsText - print result as text
+func printAsText(texts map[string][]string, doPrintName bool) {
+	for name, value := range texts {
+		if doPrintName {
+			fmt.Print(name + ":\t")
+		}
+		for _, text := range value {
+			fmt.Println(text)
+		}
+	}
 }
 
 func main() {
-	userAgent, outerCSS, url, CSSSelectors := getConfig()
+	userAgent, outerCSS, url, getJSON, CSSSelectors := getConfig()
 	var doc html2data.Doc
 	stat, err := os.Stdin.Stat()
 	if err != nil {
@@ -59,15 +73,17 @@ func main() {
 			log.Fatal(err)
 		}
 
-		for i, texts := range textsOuter {
-			fmt.Printf("%d:\n", i)
-			for name, value := range texts {
-				if len(CSSSelectors) > 1 {
-					fmt.Print(name + ":\t")
-				}
-				for _, text := range value {
-					fmt.Println(text)
-				}
+		if getJSON {
+			jsonObject := []map[string][]string{}
+			for _, texts := range textsOuter {
+				jsonObject = append(jsonObject, texts)
+			}
+			json, _ := json.Marshal(jsonObject)
+			fmt.Println(string(json))
+		} else {
+			for i, texts := range textsOuter {
+				fmt.Printf("%d:\n", i)
+				printAsText(texts, len(CSSSelectors) > 1)
 			}
 		}
 	} else {
@@ -76,13 +92,11 @@ func main() {
 			log.Fatal(err)
 		}
 
-		for name, value := range texts {
-			if len(CSSSelectors) > 1 {
-				fmt.Print(name + ":\t")
-			}
-			for _, text := range value {
-				fmt.Println(text)
-			}
+		if getJSON {
+			json, _ := json.Marshal(texts)
+			fmt.Println(string(json))
+		} else {
+			printAsText(texts, len(CSSSelectors) > 1)
 		}
 	}
 }

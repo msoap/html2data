@@ -76,11 +76,6 @@ func main() {
 }
 ```
 
-TODO
-----
-
-  * html2data: get JSON
-
 Command line utility
 --------------------
 
@@ -93,6 +88,7 @@ Command line utility
 
   * `-user-agent="Custom UA"` -- set custom user-agent
   * `-find-in="outer.css.selector"` -- search in the specified elements instead document
+  * `-json` -- get result as JSON
 
 ### TODO: install from homebrew
 
