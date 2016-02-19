@@ -26,9 +26,9 @@ Methods
   * `FromReader(io.Reader)` - create document for parse
   * `FromURL(URL, [config Cfg])` - create document from http(s) URL
   * `FromFile(file)` - create document from local file
-  * `doc.GetData(map[string]string)` - get texts by CSS selectors
-  * `doc.GetDataNested(outerCss string, map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
-  * `doc.GetDataSingle(string)` - get one result by one CSS selector
+  * `doc.GetData(css map[string]string)` - get texts by CSS selectors
+  * `doc.GetDataNested(outerCss string, css map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
+  * `doc.GetDataSingle(css string)` - get one result by one CSS selector
 
 Pseudo-selectors
 ----------------
@@ -81,6 +81,8 @@ func main() {
 Command line utility
 --------------------
 
+### Usage
+
     html2data [options] URL "css selector"
     html2data [options] URL :name1 "css1" :name2 "css2"...
     html2data [options] file.html "css selector"
@@ -93,7 +95,11 @@ Command line utility
   * `-json` -- get result as JSON
   * `-timeout=10` -- setting timeout when loading the URL
 
-### TODO: install from homebrew
+### Install
+
+Download binaries from: [releases](https://github.com/msoap/html2data/releases) (OS X/Linux/Windows/RaspberryPi)
+
+Or install from homebrew (MacOS):
 
     brew tap msoap/tools
     brew install html2data
