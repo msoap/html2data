@@ -4,7 +4,6 @@ html2data
 [![GoDoc](https://godoc.org/github.com/msoap/html2data?status.svg)](https://godoc.org/github.com/msoap/html2data)
 [![Build Status](https://travis-ci.org/msoap/html2data.svg?branch=master)](https://travis-ci.org/msoap/html2data)
 [![Coverage Status](https://coveralls.io/repos/github/msoap/html2data/badge.svg?branch=master)](https://coveralls.io/github/msoap/html2data?branch=master)
-[![GitHub release](https://img.shields.io/github/release/msoap/html2data.svg)](https://github.com/msoap/html2data/releases/latest)
 [![Github All Releases](https://img.shields.io/github/downloads/msoap/html2data/total.svg)](https://github.com/msoap/html2data/releases/latest)
 [![Homebrew formula exists](https://img.shields.io/badge/homebrew-🍺-d7af72.svg)](https://github.com/msoap/html2data#install-1)
 [![Report Card](https://goreportcard.com/badge/github.com/msoap/html2data)](https://goreportcard.com/report/github.com/msoap/html2data)
