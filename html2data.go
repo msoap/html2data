@@ -11,11 +11,11 @@ Install package only:
 
 Allowed pseudo-selectors:
 
-`:attr(attr_name)` - for getting attributes instead text
+:attr(attr_name) - for getting attributes instead text
 
-`:html` - for getting HTML instead text
+:html - for getting HTML instead text
 
-`:get(N)` - get n-th element from list
+:get(N) - get n-th element from list
 
 Command line utility:
 
