@@ -15,40 +15,50 @@ func Test_GetDataSingle(t *testing.T) {
 		html string
 		css  string
 		out  string
+		err  error
 	}{
 		{
 			"one<h1>head</h1>two",
 			"h1",
 			"head",
+			nil,
 		}, {
 			"one<h1>head</h1>two<h1>head2</h1>",
 			"h1",
 			"head",
+			nil,
 		}, {
 			"one<h1>head</h1>two<h1 id=2>head2</h1>",
 			"h1#2",
 			"head2",
+			nil,
 		}, {
 			"one<div><h1>head</h1>two</div><h1 id=2>head2</h1>",
 			"div:html",
 			"<h1>head</h1>two",
+			nil,
 		}, {
 			"one<h1>head</h1>two<a href='http://url'>link</a><h1>head2</h1>",
 			"a:attr(href)",
 			"http://url",
+			nil,
 		}, {
 			"one<h1>head1</h1>two<a href='http://url'>link</a><h1>head2</h1>",
 			"h1:get(2)",
 			"head2",
+			nil,
 		},
 	}
 
-	for _, item := range testData {
+	for i, item := range testData {
 		reader := strings.NewReader(item.html)
 		out, err := FromReader(reader).GetDataSingle(item.css)
 
-		if err != nil {
+		if err != nil && item.err == nil {
 			t.Errorf("Got error: %s", err)
+		}
+		if err == nil && item.err != nil {
+			t.Errorf("Not got error, item: %d", i)
 		}
 
 		if out != item.out {
@@ -62,24 +72,30 @@ func Test_GetData(t *testing.T) {
 		html string
 		css  map[string]string
 		out  map[string][]string
+		err  error
 	}{
 		{
 			"one<h1>head</h1>two",
 			map[string]string{"h1": "h1"},
 			map[string][]string{"h1": {"head"}},
+			nil,
 		}, {
 			"<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
 			map[string]string{"title": "title", "h1": "h1"},
 			map[string][]string{"title": {"Title"}, "h1": {"head", "Head 2"}},
+			nil,
 		},
 	}
 
-	for _, item := range testData {
+	for i, item := range testData {
 		reader := strings.NewReader(item.html)
 		out, err := FromReader(reader).GetData(item.css)
 
-		if err != nil {
+		if err != nil && item.err == nil {
 			t.Errorf("Got error: %s", err)
+		}
+		if err == nil && item.err != nil {
+			t.Errorf("Not got error, item: %d", i)
 		}
 
 		if !reflect.DeepEqual(item.out, out) {
@@ -94,45 +110,54 @@ func Test_GetDataNested(t *testing.T) {
 		outerCSS string
 		css      map[string]string
 		out      []map[string][]string
+		err      error
 	}{
 		{
 			"<div>one<h1>head</h1>two</div> <h1>head two</h1>",
 			"div",
 			map[string]string{"h1": "h1"},
 			[]map[string][]string{{"h1": {"head"}}},
+			nil,
 		},
 		{
 			"<div>one<h1>head</h1>two</div> <div><h1>head two</h1><div>",
 			"div:get(1)",
 			map[string]string{"h1": "h1"},
 			[]map[string][]string{{"h1": {"head"}}},
+			nil,
 		},
 		{
 			"<div>one<a href=url1>head</a>two</div> <div><a href=url2>head two</h1><div> <a href=url3>l3</a>",
 			"div:get(1)",
 			map[string]string{"urls": "a:attr(href)"},
 			[]map[string][]string{{"urls": {"url1"}}},
+			nil,
 		},
 		{
 			"<div>one<a href=url1>head</a>two</div> <div><a href=url2>head two</h1><div>",
 			"div:get(2)",
 			map[string]string{"urls": "a:attr(href)"},
 			[]map[string][]string{{"urls": {"url2"}}},
+			nil,
 		},
 		{
 			"<div class=cl>one<a href=url1>head</a>two<a href=url1.1>h1.1</a></div> <div><a href=url2>head two</a></div> <div class=cl><a href=url3>l3</a> </div>",
 			"div.cl",
 			map[string]string{"urls": "a:attr(href)"},
 			[]map[string][]string{{"urls": {"url1", "url1.1"}}, {"urls": {"url3"}}},
+			nil,
 		},
 	}
 
-	for _, item := range testData {
+	for i, item := range testData {
 		reader := strings.NewReader(item.html)
 		out, err := FromReader(reader).GetDataNested(item.outerCSS, item.css)
 
-		if err != nil {
+		if err != nil && item.err == nil {
 			t.Errorf("Got error: %s", err)
+		}
+		if err == nil && item.err != nil {
+			t.Errorf("Not got error, item: %d", i)
 		}
 
 		if !reflect.DeepEqual(item.out, out) {
