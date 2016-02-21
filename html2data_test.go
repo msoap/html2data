@@ -292,6 +292,10 @@ func Test_FromURL(t *testing.T) {
 	if doc.Err == nil {
 		t.Errorf("Load fake url without error")
 	}
+	doc = FromURL("fake://%%%%/")
+	if doc.Err == nil {
+		t.Errorf("Load invalid url without error")
+	}
 	doc = FromURL("")
 	if doc.Err == nil {
 		t.Errorf("Load empty url without error")
