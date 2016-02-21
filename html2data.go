@@ -187,10 +187,13 @@ type Cfg struct {
 // FromURL("https://url", Cfg{UA: "Custom UA 1.0", TimeOut: 10})
 func FromURL(URL string, config ...Cfg) Doc {
 	ua, timeout := "", 0
-	if len(config) > 0 {
+	if len(config) == 1 {
 		ua = config[0].UA
 		timeout = config[0].TimeOut
+	} else if len(config) > 1 {
+		panic("FromURL(): only one config argument allowed")
 	}
+
 	httpResponse, err := getHTMLPage(URL, ua, timeout)
 	if err != nil {
 		return Doc{Err: err}

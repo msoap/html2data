@@ -2,9 +2,12 @@ package html2data
 
 import (
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func Test_GetDataSingle(t *testing.T) {
@@ -222,5 +225,96 @@ func Test_parseSelector(t *testing.T) {
 				outString,
 			)
 		}
+	}
+}
+
+func assertDontPanic(t *testing.T, fn func(), name string) {
+	defer func() {
+		if recoverInfo := recover(); recoverInfo != nil {
+			t.Errorf("The code panic: %s\npanic: %s", name, recoverInfo)
+		}
+	}()
+	fn()
+}
+
+func assertPanic(t *testing.T, fn func(), name string) {
+	defer func() {
+		if recover() == nil {
+			t.Errorf("The code did not panic: %s", name)
+		}
+	}()
+	fn()
+}
+
+func Test_FromURL(t *testing.T) {
+	assertDontPanic(t, func() { FromURL("url") }, "FromURL() with 0 arguments")
+	assertDontPanic(t, func() { FromURL("url", Cfg{}) }, "FromURL() with 1 arguments")
+	assertPanic(t, func() { FromURL("url", Cfg{}, Cfg{}) }, "FromURL() with 2 arguments")
+
+	// test get Url
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "<div>data</div>")
+	}))
+
+	doc := FromURL(ts.URL)
+	if doc.Err != nil {
+		t.Errorf("Dont load url (%s): %s", ts.URL, doc.Err)
+	}
+	ts.Close()
+
+	// test dont get Url
+	doc = FromURL("fake://invalid/url")
+	if doc.Err == nil {
+		t.Errorf("Load fake url without error")
+	}
+	doc = FromURL("")
+	if doc.Err == nil {
+		t.Errorf("Load empty url without error")
+	}
+
+	// test timeout
+	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(1200 * time.Millisecond)
+		fmt.Fprintln(w, "<div>data</div>")
+	}))
+
+	doc = FromURL(ts.URL, Cfg{TimeOut: 1})
+	if doc.Err == nil {
+		t.Errorf("Load url without timeout error")
+	}
+	ts.Close()
+
+	// test parse
+	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "<div><a>data</a></div>")
+	}))
+
+	doc = FromURL(ts.URL)
+	if doc.Err != nil {
+		t.Errorf("Dont load url, error: %s", doc.Err)
+	}
+	div, err := doc.GetDataSingle("div")
+	if err != nil || div != "data" {
+		t.Errorf("Dont load url, div: '%s', error: %s", div, doc.Err)
+	}
+	div, err = doc.GetDataSingle("div:html")
+	if err != nil || div != "<a>data</a>" {
+		t.Errorf("Dont load url, div: '%s', error: %s", div, doc.Err)
+	}
+	ts.Close()
+
+	// UA test
+	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "<div>"+r.UserAgent()+"</div>")
+	}))
+
+	customUA := "CustomUA/1.0"
+	doc = FromURL(ts.URL, Cfg{UA: customUA})
+	if doc.Err != nil {
+		t.Errorf("Dont load url, error: %s", doc.Err)
+	}
+	div, err = doc.GetDataSingle("div")
+	if err != nil || div != customUA {
+		t.Errorf("User-agent test failed, div: '%s'", div)
 	}
 }
