@@ -318,3 +318,11 @@ func Test_FromURL(t *testing.T) {
 		t.Errorf("User-agent test failed, div: '%s'", div)
 	}
 }
+
+func Test_FromFile(t *testing.T) {
+	doc := FromFile("/dont exists file")
+	_, err := doc.GetDataSingle("div")
+	if err == nil {
+		t.Errorf("FromFile(): open dont exists file")
+	}
+}
