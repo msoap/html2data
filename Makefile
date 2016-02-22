@@ -1,0 +1,9 @@
+test:
+	go test -cover ./...
+
+lint:
+	golint ./...
+	go vet ./...
+
+update-from-github:
+	go get -u github.com/msoap/html2data/cmd/html2data
