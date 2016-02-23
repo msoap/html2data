@@ -19,9 +19,9 @@ Allowed pseudo-selectors:
 
 Command line utility:
 
-    html2data URL "css selector"
-    html2data file.html "css selector"
-    cat file.html | html2data "css selector"
+	html2data URL "css selector"
+	html2data file.html "css selector"
+	cat file.html | html2data "css selector"
 
 */
 package html2data
