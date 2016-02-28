@@ -20,4 +20,4 @@ script:
   - go test -coverprofile=cmd.coverprofile ./cmd/html2data
   - go test -coverprofile=main.coverprofile
   - $HOME/gopath/bin/gover
-  - if [ "$(go version | awk '{print $3}')" = "go1.6" ]; then $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci || true; fi
+  - if [ "$TRAVIS_GO_VERSION" = "1.6" ]; then $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci || true; fi
