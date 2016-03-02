@@ -24,11 +24,17 @@ Methods
 -------
 
   * `FromReader(io.Reader)` - create document for parse
-  * `FromURL(URL, [config Cfg])` - create document from http(s) URL
+  * `FromURL(URL, [config URLCfg])` - create document from http(s) URL
   * `FromFile(file)` - create document from local file
   * `doc.GetData(css map[string]string)` - get texts by CSS selectors
   * `doc.GetDataNested(outerCss string, css map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
   * `doc.GetDataSingle(css string)` - get one result by one CSS selector
+
+  or with config:
+
+  * `doc.GetData(css map[string]string, html2data.Cfg{DontTrimSpaces: true})`
+  * `doc.GetDataNested(outerCss string, css map[string]string, html2data.Cfg{DontTrimSpaces: true})`
+  * `doc.GetDataSingle(css string, html2data.Cfg{DontTrimSpaces: true})`
 
 Pseudo-selectors
 ----------------
@@ -53,7 +59,7 @@ import (
 func main() {
     doc := html2data.FromURL("http://example.com")
     // or with config
-    // doc := html2data.FromURL("http://example.com", html2data.Cfg{UA: "userAgent", TimeOut: 10})
+    // doc := html2data.FromURL("http://example.com", html2data.URLCfg{UA: "userAgent", TimeOut: 10})
     if doc.Err != nil {
         log.Fatal(doc.Err)
     }
@@ -61,6 +67,9 @@ func main() {
     // get title
     title, _ := doc.GetDataSingle("title")
     fmt.Println("Title is:", title)
+
+    title, _ = doc.GetDataSingle("title", html2data.Cfg{DontTrimSpaces: true})
+    fmt.Println("Title as is, with spaces:", title)
 
     texts, _ := doc.GetData(map[string]string{"h1": "h1", "links": "a:attr(href)"})
     // get all H1 headers:
@@ -93,6 +102,7 @@ Command line utility
   * `-user-agent="Custom UA"` -- set custom user-agent
   * `-find-in="outer.css.selector"` -- search in the specified elements instead document
   * `-json` -- get result as JSON
+  * `-dont-trim-spaces` -- get text as is
   * `-timeout=10` -- setting timeout when loading the URL
 
 ### Install

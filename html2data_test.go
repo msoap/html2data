@@ -23,6 +23,11 @@ func Test_GetDataSingle(t *testing.T) {
 			"head",
 			nil,
 		}, {
+			"one<h1>  head  </h1>two",
+			"h1",
+			"head",
+			nil,
+		}, {
 			"one<h1>head</h1>two<h1>head2</h1>",
 			"h1",
 			"head",
@@ -71,25 +76,46 @@ func Test_GetData(t *testing.T) {
 	testData := []struct {
 		html string
 		css  map[string]string
+		cfg  []Cfg
 		out  map[string][]string
 		err  error
 	}{
 		{
-			"one<h1>head</h1>two",
-			map[string]string{"h1": "h1"},
-			map[string][]string{"h1": {"head"}},
-			nil,
+			html: "one<h1>head</h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{},
+			out:  map[string][]string{"h1": {"head"}},
+			err:  nil,
 		}, {
-			"<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
-			map[string]string{"title": "title", "h1": "h1"},
-			map[string][]string{"title": {"Title"}, "h1": {"head", "Head 2"}},
-			nil,
+			html: "one<h1> head </h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{},
+			out:  map[string][]string{"h1": {"head"}},
+			err:  nil,
+		}, {
+			html: "one<h1>head</h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{{DontTrimSpaces: true}},
+			out:  map[string][]string{"h1": {"head"}},
+			err:  nil,
+		}, {
+			html: "one<h1> head </h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{{DontTrimSpaces: true}},
+			out:  map[string][]string{"h1": {" head "}},
+			err:  nil,
+		}, {
+			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
+			css:  map[string]string{"title": "title", "h1": "h1"},
+			cfg:  []Cfg{},
+			out:  map[string][]string{"title": {"Title"}, "h1": {"head", "Head 2"}},
+			err:  nil,
 		},
 	}
 
 	for i, item := range testData {
 		reader := strings.NewReader(item.html)
-		out, err := FromReader(reader).GetData(item.css)
+		out, err := FromReader(reader).GetData(item.css, item.cfg...)
 
 		if err != nil && item.err == nil {
 			t.Errorf("Got error: %s", err)
@@ -99,7 +125,7 @@ func Test_GetData(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(item.out, out) {
-			t.Errorf("expected: %#v, real: %#v", item.out, out)
+			t.Errorf("%d. expected: %#v, real: %#v", i, item.out, out)
 		}
 	}
 }
@@ -273,8 +299,8 @@ func assertPanic(t *testing.T, fn func(), name string) {
 
 func Test_FromURL(t *testing.T) {
 	assertDontPanic(t, func() { FromURL("url") }, "FromURL() with 0 arguments")
-	assertDontPanic(t, func() { FromURL("url", Cfg{}) }, "FromURL() with 1 arguments")
-	assertPanic(t, func() { FromURL("url", Cfg{}, Cfg{}) }, "FromURL() with 2 arguments")
+	assertDontPanic(t, func() { FromURL("url", URLCfg{}) }, "FromURL() with 1 arguments")
+	assertPanic(t, func() { FromURL("url", URLCfg{}, URLCfg{}) }, "FromURL() with 2 arguments")
 
 	// test get Url
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -307,7 +333,7 @@ func Test_FromURL(t *testing.T) {
 		fmt.Fprintln(w, "<div>data</div>")
 	}))
 
-	doc = FromURL(ts.URL, Cfg{TimeOut: 1})
+	doc = FromURL(ts.URL, URLCfg{TimeOut: 1})
 	if doc.Err == nil {
 		t.Errorf("Load url without timeout error")
 	}
@@ -338,7 +364,7 @@ func Test_FromURL(t *testing.T) {
 	}))
 
 	customUA := "CustomUA/1.0"
-	doc = FromURL(ts.URL, Cfg{UA: customUA})
+	doc = FromURL(ts.URL, URLCfg{UA: customUA})
 	if doc.Err != nil {
 		t.Errorf("Dont load url, error: %s", doc.Err)
 	}
@@ -354,4 +380,25 @@ func Test_FromFile(t *testing.T) {
 	if err == nil {
 		t.Errorf("FromFile(): open dont exists file")
 	}
+}
+
+func Test_getConfig(t *testing.T) {
+	cfg := getConfig([]Cfg{})
+	if !reflect.DeepEqual(cfg, Cfg{}) {
+		t.Errorf("1. getConfig(): empty list")
+	}
+
+	cfg = getConfig([]Cfg{{}})
+	if !reflect.DeepEqual(cfg, Cfg{}) {
+		t.Errorf("2. getConfig(): list with one element")
+	}
+
+	cfg = getConfig([]Cfg{{DontTrimSpaces: true}})
+	if !reflect.DeepEqual(cfg, Cfg{DontTrimSpaces: true}) {
+		t.Errorf("3. getConfig(): list with one element with true")
+	}
+
+	assertPanic(t, func() {
+		getConfig([]Cfg{{}, {}})
+	}, "3. getConfig() must panic")
 }

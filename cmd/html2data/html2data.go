@@ -20,6 +20,7 @@ const usageString = "Usage:\n" +
 type cmdConfig struct {
 	userAgent, outerCSS, url string
 	getJSON                  bool
+	dontTrimSpaces           bool
 	timeOut                  int
 }
 
@@ -27,6 +28,7 @@ func getConfig() (config cmdConfig, CSSSelectors map[string]string) {
 	flag.StringVar(&config.userAgent, "user-agent", "", "set custom user-agent")
 	flag.StringVar(&config.outerCSS, "find-in", "", "search in the specified elements instead document")
 	flag.BoolVar(&config.getJSON, "json", false, "JSON output")
+	flag.BoolVar(&config.dontTrimSpaces, "dont-trim-spaces", false, "dont trim spaces, get text as is")
 	flag.IntVar(&config.timeOut, "timeout", 0, "timeout in seconds")
 	flag.Usage = func() {
 		fmt.Println(usageString)
@@ -67,7 +69,7 @@ func main() {
 		reader := bufio.NewReader(os.Stdin)
 		doc = html2data.FromReader(reader)
 	} else if strings.HasPrefix(config.url, "http://") || strings.HasPrefix(config.url, "https://") {
-		doc = html2data.FromURL(config.url, html2data.Cfg{UA: config.userAgent, TimeOut: config.timeOut})
+		doc = html2data.FromURL(config.url, html2data.URLCfg{UA: config.userAgent, TimeOut: config.timeOut})
 	} else if len(config.url) > 0 {
 		doc = html2data.FromFile(config.url)
 	} else {
@@ -75,8 +77,9 @@ func main() {
 		return
 	}
 
+	GetDocCfg := html2data.Cfg{DontTrimSpaces: config.dontTrimSpaces}
 	if config.outerCSS != "" {
-		textsOuter, err := doc.GetDataNested(config.outerCSS, CSSSelectors)
+		textsOuter, err := doc.GetDataNested(config.outerCSS, CSSSelectors, GetDocCfg)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -95,7 +98,7 @@ func main() {
 			}
 		}
 	} else {
-		texts, err := doc.GetData(CSSSelectors)
+		texts, err := doc.GetData(CSSSelectors, GetDocCfg)
 		if err != nil {
 			log.Fatal(err)
 		}

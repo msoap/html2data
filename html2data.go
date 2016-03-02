@@ -59,8 +59,13 @@ type CSSSelector struct {
 	getNth   int
 }
 
+// Cfg - config for GetData* methods
+type Cfg struct {
+	DontTrimSpaces bool // get text as is, by default trim spaces
+}
+
 // getDataFromDocOrSelection - extract data by CSS-selectors from goquery.Selection or goquery.Doc
-func (doc Doc) getDataFromDocOrSelection(docOrSelection docOrSelection, selectors map[string]string) (result map[string][]string, err error) {
+func (doc Doc) getDataFromDocOrSelection(docOrSelection docOrSelection, selectors map[string]string, config Cfg) (result map[string][]string, err error) {
 	if doc.Err != nil {
 		return result, fmt.Errorf("parse document error: %s", doc.Err)
 	}
@@ -75,17 +80,23 @@ func (doc Doc) getDataFromDocOrSelection(docOrSelection docOrSelection, selector
 				return
 			}
 
-			if selector.attrName != "" {
-				texts = append(texts, selection.AttrOr(selector.attrName, ""))
-			} else if selector.getHTML {
-				HTML, err := selection.Html()
+			foundText := ""
+			switch {
+			case selector.attrName != "":
+				foundText = selection.AttrOr(selector.attrName, "")
+			case selector.getHTML:
+				foundText, err = selection.Html()
 				if err != nil {
 					return
 				}
-				texts = append(texts, HTML)
-			} else {
-				texts = append(texts, selection.Text())
+			default:
+				foundText = selection.Text()
 			}
+
+			if !config.DontTrimSpaces {
+				foundText = strings.TrimSpace(foundText)
+			}
+			texts = append(texts, foundText)
 		})
 		result[name] = texts
 	}
@@ -117,23 +128,35 @@ func parseSelector(inputSelector string) (outSelector CSSSelector) {
 	return outSelector
 }
 
+// getConfig - get first config element from list
+func getConfig(configs []Cfg) Cfg {
+	switch {
+	case len(configs) == 0:
+		return Cfg{}
+	case len(configs) == 1:
+		return configs[0]
+	default:
+		panic("[]Cfg length must be equal 0 or 1")
+	}
+}
+
 // GetData - extract data by CSS-selectors
 //  texts, err := doc.GetData(map[string]string{"h1": "h1"})
-func (doc Doc) GetData(selectors map[string]string) (result map[string][]string, err error) {
-	result, err = doc.getDataFromDocOrSelection(doc.doc, selectors)
+func (doc Doc) GetData(selectors map[string]string, configs ...Cfg) (result map[string][]string, err error) {
+	result, err = doc.getDataFromDocOrSelection(doc.doc, selectors, getConfig(configs))
 	return result, err
 }
 
 // GetDataNested - extract nested data by CSS-selectors from another CSS-selector
 //  texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
-func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string) (result []map[string][]string, err error) {
+func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string, configs ...Cfg) (result []map[string][]string, err error) {
 	selector := parseSelector(selectorRaw)
 	doc.doc.Find(selector.selector).Each(func(i int, selection *goquery.Selection) {
 		if selector.getNth > 0 && selector.getNth != i+1 {
 			return
 		}
 
-		nestedResult, nestedErr := doc.getDataFromDocOrSelection(selection, nestedSelectors)
+		nestedResult, nestedErr := doc.getDataFromDocOrSelection(selection, nestedSelectors, getConfig(configs))
 		if nestedErr != nil {
 			err = nestedErr
 		}
@@ -145,8 +168,8 @@ func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]stri
 
 // GetDataSingle - extract data by one CSS-selector
 //  title, err := doc.GetDataSingle("title")
-func (doc Doc) GetDataSingle(selector string) (result string, err error) {
-	texts, err := doc.GetData(map[string]string{"single": selector})
+func (doc Doc) GetDataSingle(selector string, configs ...Cfg) (result string, err error) {
+	texts, err := doc.GetData(map[string]string{"single": selector}, getConfig(configs))
 	if err != nil {
 		return result, err
 	}
@@ -175,8 +198,8 @@ func FromFile(fileName string) Doc {
 	return FromReader(fileReader)
 }
 
-// Cfg - config for FromURL()
-type Cfg struct {
+// URLCfg - config for FromURL()
+type URLCfg struct {
 	UA      string // custom user-agent
 	TimeOut int    // timeout in seconds
 }
@@ -184,8 +207,8 @@ type Cfg struct {
 // FromURL - get doc from URL
 //
 // FromURL("https://url")
-// FromURL("https://url", Cfg{UA: "Custom UA 1.0", TimeOut: 10})
-func FromURL(URL string, config ...Cfg) Doc {
+// FromURL("https://url", URLCfg{UA: "Custom UA 1.0", TimeOut: 10})
+func FromURL(URL string, config ...URLCfg) Doc {
 	ua, timeout := "", 0
 	if len(config) == 1 {
 		ua = config[0].UA
