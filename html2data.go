@@ -206,8 +206,8 @@ type URLCfg struct {
 
 // FromURL - get doc from URL
 //
-// FromURL("https://url")
-// FromURL("https://url", URLCfg{UA: "Custom UA 1.0", TimeOut: 10})
+//  FromURL("https://url")
+//  FromURL("https://url", URLCfg{UA: "Custom UA 1.0", TimeOut: 10})
 func FromURL(URL string, config ...URLCfg) Doc {
 	ua, timeout := "", 0
 	if len(config) == 1 {
