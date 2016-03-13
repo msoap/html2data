@@ -69,6 +69,11 @@ func (doc Doc) getDataFromDocOrSelection(docOrSelection docOrSelection, selector
 	if doc.Err != nil {
 		return result, fmt.Errorf("parse document error: %s", doc.Err)
 	}
+	defer func() {
+		if errRecoverRaw := recover(); errRecoverRaw != nil {
+			result, err = map[string][]string{}, fmt.Errorf("%s", errRecoverRaw)
+		}
+	}()
 
 	result = map[string][]string{}
 	for name, selectorRaw := range selectors {
@@ -151,6 +156,13 @@ func (doc Doc) GetData(selectors map[string]string, configs ...Cfg) (result map[
 //  texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
 func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string, configs ...Cfg) (result []map[string][]string, err error) {
 	selector := parseSelector(selectorRaw)
+	defer func() {
+		if errRecoverRaw := recover(); errRecoverRaw != nil {
+			result, err = []map[string][]string{}, fmt.Errorf("%s", errRecoverRaw)
+		}
+	}()
+	result = []map[string][]string{}
+
 	doc.doc.Find(selector.selector).Each(func(i int, selection *goquery.Selection) {
 		if selector.getNth > 0 && selector.getNth != i+1 {
 			return
@@ -159,10 +171,12 @@ func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]stri
 		nestedResult, nestedErr := doc.getDataFromDocOrSelection(selection, nestedSelectors, getConfig(configs))
 		if nestedErr != nil {
 			err = nestedErr
+			return
 		}
 
 		result = append(result, nestedResult)
 	})
+
 	return result, err
 }
 

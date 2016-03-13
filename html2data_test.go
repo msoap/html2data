@@ -55,6 +55,11 @@ func Test_GetDataSingle(t *testing.T) {
 			"h1:get(2)",
 			"head2",
 			nil,
+		}, {
+			"<div>",
+			"div<<<",
+			"",
+			fmt.Errorf("error"),
 		},
 	}
 
@@ -113,6 +118,12 @@ func Test_GetData(t *testing.T) {
 			cfg:  []Cfg{},
 			out:  map[string][]string{"title": {"Title"}, "h1": {"head", "Head 2"}},
 			err:  nil,
+		}, {
+			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
+			css:  map[string]string{"title": "title<<"},
+			cfg:  []Cfg{},
+			out:  map[string][]string{},
+			err:  fmt.Errorf("error"),
 		},
 	}
 
@@ -175,6 +186,20 @@ func Test_GetDataNested(t *testing.T) {
 			map[string]string{"urls": "a:attr(href)"},
 			[]map[string][]string{{"urls": {"url1", "url1.1"}}, {"urls": {"url3"}}},
 			nil,
+		},
+		{
+			"<div class=cl>one</div>",
+			"div.cl<<",
+			map[string]string{"urls": "a:attr(href)"},
+			[]map[string][]string{},
+			fmt.Errorf("error"),
+		},
+		{
+			"<div class=cl>one</div>",
+			"div.cl",
+			map[string]string{"urls": "div<<"},
+			[]map[string][]string{},
+			fmt.Errorf("error"),
 		},
 	}
 
