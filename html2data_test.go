@@ -460,7 +460,7 @@ func ExampleFromReader() {
 
 func ExampleDoc_GetDataSingle() {
 	// get title
-	title, err := FromFile("test.html").GetDataSingle("title")
+	title, err := FromFile("cmd/html2data/test.html").GetDataSingle("title")
 	if err != nil {
 		log.Fatal(err)
 	}
