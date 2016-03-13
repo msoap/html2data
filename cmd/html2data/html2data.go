@@ -36,7 +36,7 @@ func init() {
 	flag.IntVar(&config.timeOut, "timeout", 0, "timeout in seconds")
 }
 
-func getConfig() (CSSSelectors map[string]string) {
+func getConfig() (CSSSelectors map[string]string, err error) {
 	flag.Usage = func() {
 		fmt.Println(usageString)
 		flag.PrintDefaults()
@@ -44,12 +44,8 @@ func getConfig() (CSSSelectors map[string]string) {
 	}
 	flag.Parse()
 
-	var err error
 	config.url, CSSSelectors, err = parseArgs(flag.Args())
-	if err != nil {
-		log.Fatal(err)
-	}
-	return CSSSelectors
+	return CSSSelectors, err
 }
 
 // printAsText - print result as text
@@ -64,12 +60,15 @@ func printAsText(texts map[string][]string, doPrintName bool) {
 	}
 }
 
-func main() {
-	CSSSelectors := getConfig()
+func runApp() error {
+	CSSSelectors, err := getConfig()
+	if err != nil {
+		return err
+	}
 	var doc html2data.Doc
 	stat, err := os.Stdin.Stat()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if config.url == "-" || (stat.Mode()&os.ModeCharDevice) == 0 {
@@ -81,14 +80,14 @@ func main() {
 		doc = html2data.FromFile(config.url)
 	} else {
 		fmt.Println(usageString)
-		return
+		return nil
 	}
 
 	GetDocCfg := html2data.Cfg{DontTrimSpaces: config.dontTrimSpaces}
 	if config.outerCSS != "" {
 		textsOuter, err := doc.GetDataNested(config.outerCSS, CSSSelectors, GetDocCfg)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		if config.getJSON {
@@ -107,7 +106,7 @@ func main() {
 	} else {
 		texts, err := doc.GetData(CSSSelectors, GetDocCfg)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		if config.getJSON {
@@ -116,5 +115,14 @@ func main() {
 		} else {
 			printAsText(texts, len(CSSSelectors) > 1)
 		}
+	}
+
+	return nil
+}
+
+func main() {
+	err := runApp()
+	if err != nil {
+		log.Fatal(err)
 	}
 }
