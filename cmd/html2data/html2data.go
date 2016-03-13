@@ -24,12 +24,19 @@ type cmdConfig struct {
 	timeOut                  int
 }
 
-func getConfig() (config cmdConfig, CSSSelectors map[string]string) {
+var (
+	config cmdConfig
+)
+
+func init() {
 	flag.StringVar(&config.userAgent, "user-agent", "", "set custom user-agent")
 	flag.StringVar(&config.outerCSS, "find-in", "", "search in the specified elements instead document")
 	flag.BoolVar(&config.getJSON, "json", false, "JSON output")
 	flag.BoolVar(&config.dontTrimSpaces, "dont-trim-spaces", false, "dont trim spaces, get text as is")
 	flag.IntVar(&config.timeOut, "timeout", 0, "timeout in seconds")
+}
+
+func getConfig() (CSSSelectors map[string]string) {
 	flag.Usage = func() {
 		fmt.Println(usageString)
 		flag.PrintDefaults()
@@ -42,7 +49,7 @@ func getConfig() (config cmdConfig, CSSSelectors map[string]string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return config, CSSSelectors
+	return CSSSelectors
 }
 
 // printAsText - print result as text
@@ -58,7 +65,7 @@ func printAsText(texts map[string][]string, doPrintName bool) {
 }
 
 func main() {
-	config, CSSSelectors := getConfig()
+	CSSSelectors := getConfig()
 	var doc html2data.Doc
 	stat, err := os.Stdin.Stat()
 	if err != nil {
