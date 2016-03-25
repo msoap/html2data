@@ -301,9 +301,5 @@ func getHTMLPage(url string, ua string, timeout int) (response *http.Response, e
 	}
 
 	response, err = client.Do(request)
-	if err != nil {
-		return response, err
-	}
-
 	return response, err
 }
