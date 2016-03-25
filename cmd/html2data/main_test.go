@@ -46,7 +46,7 @@ func Test_main(t *testing.T) {
 	}
 
 	// plain text
-	out, err = mainWrapper(t, []string{"html2data", "test.html", "h1"})
+	out, err = mainWrapper(t, []string{"html2data", "test.html", "div.article h1"})
 	if err != nil || out != "Head1\nHead2" {
 		t.Errorf("2. main() failed: got: '%s'", out)
 	}
@@ -64,7 +64,7 @@ func Test_main(t *testing.T) {
 	}
 
 	// json
-	out, err = mainWrapper(t, []string{"html2data", "-json", "test.html", "h1"})
+	out, err = mainWrapper(t, []string{"html2data", "-json", "test.html", "div.article h1"})
 	if err != nil || out != `{"one":["Head1","Head2"]}` {
 		t.Errorf("5. main() failed: got: '%s'", out)
 	}

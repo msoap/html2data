@@ -296,6 +296,54 @@ func Test_GetDataNested(t *testing.T) {
 	}
 }
 
+func Test_GetDataNestedFirst(t *testing.T) {
+	testData := []struct {
+		html     string
+		outerCSS string
+		css      map[string]string
+		out      []map[string]string
+		err      error
+	}{
+		{
+			"<div>one<h1>head</h1>two</div> <h1>head two</h1>",
+			"div",
+			map[string]string{"h1": "h1"},
+			[]map[string]string{{"h1": "head"}},
+			nil,
+		},
+		{
+			"<div class=cl>one</div>",
+			"div.cl<<",
+			map[string]string{"urls": "a:attr(href)"},
+			nil,
+			fmt.Errorf("error"),
+		},
+		{
+			"<div class=cl>one</div>",
+			"div.cl",
+			map[string]string{"urls": "div<<"},
+			nil,
+			fmt.Errorf("error"),
+		},
+	}
+
+	for i, item := range testData {
+		reader := strings.NewReader(item.html)
+		out, err := FromReader(reader).GetDataNestedFirst(item.outerCSS, item.css)
+
+		if err != nil && item.err == nil {
+			t.Errorf("Got error: %s", err)
+		}
+		if err == nil && item.err != nil {
+			t.Errorf("Not got error, item: %d", i)
+		}
+
+		if !reflect.DeepEqual(item.out, out) {
+			t.Errorf("\nhtml: %s\ncss: %s\nexpected: %#v\nreal    : %#v", item.html, item.css, item.out, out)
+		}
+	}
+}
+
 func Test_parseSelector(t *testing.T) {
 	testData := []struct {
 		inSelector  string
@@ -589,6 +637,33 @@ func ExampleDoc_GetDataNested() {
 			}
 		}
 	}
+}
+
+func ExampleDoc_GetDataNestedFirst() {
+	texts, err := FromFile("cmd/html2data/test.html").GetDataNestedFirst("div.block", map[string]string{"header": "h1", "link": "a:attr(href)", "sp": "span"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("")
+	for _, block := range texts {
+		// get first H1 header
+		fmt.Printf("header - %s\n", block["header"])
+
+		// get first link
+		fmt.Printf("first URL - %s\n", block["link"])
+
+		// get not exists span
+		fmt.Printf("span - '%s'\n", block["span"])
+	}
+
+	// Output:
+	// header - Head1.1
+	// first URL - http://url1
+	// span - ''
+	// header - Head2.1
+	// first URL - http://url2
+	// span - ''
 }
 
 func Example() {

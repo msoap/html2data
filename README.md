@@ -29,6 +29,7 @@ Methods
   * `doc.GetData(css map[string]string)` - get texts by CSS selectors
   * `doc.GetDataFirst(css map[string]string)` - get texts by CSS selectors, get first entry for each selector or ""
   * `doc.GetDataNested(outerCss string, css map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
+  * `doc.GetDataNestedFirst(outerCss string, css map[string]string)` - extract nested data by CSS-selectors from another CSS-selector, get first entry for each selector or ""
   * `doc.GetDataSingle(css string)` - get one result by one CSS selector
 
   or with config:
