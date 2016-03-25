@@ -152,6 +152,26 @@ func (doc Doc) GetData(selectors map[string]string, configs ...Cfg) (result map[
 	return result, err
 }
 
+// GetDataFirst - extract data by CSS-selectors, get first entry for each selector or ""
+//  texts, err := doc.GetDataFirst(map[string]string{"h1": "h1"})
+func (doc Doc) GetDataFirst(selectors map[string]string, configs ...Cfg) (result map[string]string, err error) {
+	resultRaw, err := doc.getDataFromDocOrSelection(doc.doc, selectors, getConfig(configs))
+	if err != nil {
+		return result, err
+	}
+
+	result = map[string]string{}
+	for key := range resultRaw {
+		if len(resultRaw[key]) > 0 {
+			result[key] = resultRaw[key][0]
+		} else {
+			result[key] = ""
+		}
+	}
+
+	return result, err
+}
+
 // GetDataNested - extract nested data by CSS-selectors from another CSS-selector
 //  texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
 func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string, configs ...Cfg) (result []map[string][]string, err error) {

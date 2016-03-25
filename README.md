@@ -27,6 +27,7 @@ Methods
   * `FromURL(URL, [config URLCfg])` - create document from http(s) URL
   * `FromFile(file)` - create document from local file
   * `doc.GetData(css map[string]string)` - get texts by CSS selectors
+  * `doc.GetDataFirst(css map[string]string)` - get texts by CSS selectors, get first entry for each selector or ""
   * `doc.GetDataNested(outerCss string, css map[string]string)` - extract nested data by CSS-selectors from another CSS-selector
   * `doc.GetDataSingle(css string)` - get one result by one CSS selector
 

@@ -144,6 +144,82 @@ func Test_GetData(t *testing.T) {
 	}
 }
 
+func Test_GetDataFirst(t *testing.T) {
+	testData := []struct {
+		html string
+		css  map[string]string
+		cfg  []Cfg
+		out  map[string]string
+		err  error
+	}{
+		{
+			html: "one<h1>head</h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{},
+			out:  map[string]string{"h1": "head"},
+			err:  nil,
+		}, {
+			html: "one<h1> head </h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{},
+			out:  map[string]string{"h1": "head"},
+			err:  nil,
+		}, {
+			html: "one<h1>head</h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{{DontTrimSpaces: true}},
+			out:  map[string]string{"h1": "head"},
+			err:  nil,
+		}, {
+			html: "one<h1> head </h1>two",
+			css:  map[string]string{"h1": "h1"},
+			cfg:  []Cfg{{DontTrimSpaces: true}},
+			out:  map[string]string{"h1": " head "},
+			err:  nil,
+		}, {
+			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
+			css:  map[string]string{"title": "title", "h1": "h1"},
+			cfg:  []Cfg{},
+			out:  map[string]string{"title": "Title", "h1": "head"},
+			err:  nil,
+		}, {
+			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
+			css:  map[string]string{"title": "title<<"},
+			cfg:  []Cfg{},
+			out:  nil,
+			err:  fmt.Errorf("error"),
+		}, {
+			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
+			css:  map[string]string{"title": "title", "h3": "h3"},
+			cfg:  []Cfg{},
+			out:  map[string]string{"title": "Title", "h3": ""},
+			err:  nil,
+		}, {
+			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
+			css:  map[string]string{"h2": "h2:html", "h3": "h3"},
+			cfg:  []Cfg{},
+			out:  map[string]string{"h2": "", "h3": ""},
+			err:  nil,
+		},
+	}
+
+	for i, item := range testData {
+		reader := strings.NewReader(item.html)
+		out, err := FromReader(reader).GetDataFirst(item.css, item.cfg...)
+
+		if err != nil && item.err == nil {
+			t.Errorf("Got error: %s", err)
+		}
+		if err == nil && item.err != nil {
+			t.Errorf("Not got error, item: %d", i)
+		}
+
+		if !reflect.DeepEqual(item.out, out) {
+			t.Errorf("%d. expected: %#v, real: %#v", i, item.out, out)
+		}
+	}
+}
+
 func Test_GetDataNested(t *testing.T) {
 	testData := []struct {
 		html     string
@@ -483,6 +559,18 @@ func ExampleDoc_GetData() {
 			fmt.Println(text)
 		}
 	}
+}
+
+func ExampleDoc_GetDataFirst() {
+	texts, err := FromURL("http://example.com").GetDataFirst(map[string]string{"header": "h1", "first_link": "a:attr(href)"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// get H1 header:
+	fmt.Println("header: ", texts["header"])
+	// get URL in first link:
+	fmt.Println("first link: ", texts["first_link"])
 }
 
 func ExampleDoc_GetDataNested() {
