@@ -23,8 +23,8 @@ func mainWrapper(t *testing.T, args []string) (out string, err error) {
 	// copy the output in a separate goroutine so printing can't block indefinitely
 	go func() {
 		var buf bytes.Buffer
-		_, err = io.Copy(&buf, reader)
-		if err != nil && err != io.EOF {
+		_, err := io.Copy(&buf, reader)
+		if err != nil {
 			t.Errorf("io.Copy() failed")
 		}
 
