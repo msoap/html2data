@@ -23,14 +23,26 @@ func mainWrapper(t *testing.T, args []string) (out string, err error) {
 	// copy the output in a separate goroutine so printing can't block indefinitely
 	go func() {
 		var buf bytes.Buffer
-		io.Copy(&buf, reader)
+		_, err = io.Copy(&buf, reader)
+		if err != nil && err != io.EOF {
+			t.Errorf("io.Copy() failed")
+		}
+
 		outCh <- buf.String()
 	}()
 
 	os.Args = args
 	config = cmdConfig{}
+
 	err = runApp()
-	writer.Close()
+	if err != nil {
+		return out, err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return out, err
+	}
 
 	out = <-outCh
 	os.Stdout = oldStdout

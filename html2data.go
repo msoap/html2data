@@ -251,9 +251,14 @@ func FromFile(fileName string) Doc {
 	if err != nil {
 		return Doc{Err: err}
 	}
-	defer fileReader.Close()
 
-	return FromReader(fileReader)
+	doc := FromReader(fileReader)
+	err = fileReader.Close()
+	if err != nil {
+		return Doc{Err: err}
+	}
+
+	return doc
 }
 
 // URLCfg - config for FromURL()
