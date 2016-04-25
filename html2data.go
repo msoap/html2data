@@ -38,6 +38,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/net/html/charset"
 )
 
 // docOrSelection - for exec .Find
@@ -263,8 +264,9 @@ func FromFile(fileName string) Doc {
 
 // URLCfg - config for FromURL()
 type URLCfg struct {
-	UA      string // custom user-agent
-	TimeOut int    // timeout in seconds
+	UA                string // custom user-agent
+	TimeOut           int    // timeout in seconds
+	DontDetectCharset bool   // dont autoconvert to UTF8
 }
 
 // FromURL - get doc from URL
@@ -272,24 +274,25 @@ type URLCfg struct {
 //  FromURL("https://url")
 //  FromURL("https://url", URLCfg{UA: "Custom UA 1.0", TimeOut: 10})
 func FromURL(URL string, config ...URLCfg) Doc {
-	ua, timeout := "", 0
+	ua, timeout, dontDetectCharset := "", 0, false
 	if len(config) == 1 {
 		ua = config[0].UA
 		timeout = config[0].TimeOut
+		dontDetectCharset = config[0].DontDetectCharset
 	} else if len(config) > 1 {
 		panic("FromURL(): only one config argument allowed")
 	}
 
-	httpResponse, err := getHTMLPage(URL, ua, timeout)
+	htmlReader, err := getHTMLPage(URL, ua, timeout, dontDetectCharset)
 	if err != nil {
 		return Doc{Err: err}
 	}
 
-	return FromReader(httpResponse.Body)
+	return FromReader(htmlReader)
 }
 
 // getHTMLPage - get html by http(s) as http.Response
-func getHTMLPage(url string, ua string, timeout int) (response *http.Response, err error) {
+func getHTMLPage(url string, ua string, timeout int, dontDetectCharset bool) (htmlReader io.Reader, err error) {
 	cookie, _ := cookiejar.New(nil)
 	client := &http.Client{
 		Jar:     cookie,
@@ -298,13 +301,26 @@ func getHTMLPage(url string, ua string, timeout int) (response *http.Response, e
 
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return response, err
+		return htmlReader, err
 	}
 
 	if ua != "" {
 		request.Header.Set("User-Agent", ua)
 	}
 
-	response, err = client.Do(request)
-	return response, err
+	response, err := client.Do(request)
+	if err != nil {
+		return htmlReader, err
+	}
+
+	if contentType := response.Header.Get("Content-Type"); contentType != "" && !dontDetectCharset {
+		htmlReader, err = charset.NewReader(response.Body, contentType)
+		if err != nil {
+			return htmlReader, err
+		}
+	} else {
+		return response.Body, nil
+	}
+
+	return htmlReader, nil
 }

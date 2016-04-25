@@ -512,7 +512,7 @@ func Test_FromURL(t *testing.T) {
 
 	// UA test
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "<div>"+r.UserAgent()+"</div>")
+		fmt.Fprintln(w, "<div>"+r.UserAgent()+"</div><span id=2>Тест</span>")
 	}))
 
 	customUA := "CustomUA/1.0"
@@ -524,6 +524,16 @@ func Test_FromURL(t *testing.T) {
 	if err != nil || div != customUA {
 		t.Errorf("User-agent test failed, div: '%s'", div)
 	}
+
+	doc = FromURL(ts.URL, URLCfg{DontDetectCharset: true})
+	if doc.Err != nil {
+		t.Errorf("Dont load url, error: %s", doc.Err)
+	}
+	span, err := doc.GetDataSingle("span#2")
+	if err != nil || span != "Тест" {
+		t.Errorf("DontDetectCharset failed, span: '%s'", div)
+	}
+	ts.Close()
 }
 
 func Test_FromFile(t *testing.T) {

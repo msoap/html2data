@@ -22,6 +22,7 @@ type cmdConfig struct {
 	getJSON                  bool
 	dontTrimSpaces           bool
 	timeOut                  int
+	dontDetectCharset        bool
 }
 
 var (
@@ -33,6 +34,7 @@ func init() {
 	flag.StringVar(&config.outerCSS, "find-in", "", "search in the specified elements instead document")
 	flag.BoolVar(&config.getJSON, "json", false, "JSON output")
 	flag.BoolVar(&config.dontTrimSpaces, "dont-trim-spaces", false, "dont trim spaces, get text as is")
+	flag.BoolVar(&config.dontDetectCharset, "dont-detect-charset", false, "dont detect charset and convert text")
 	flag.IntVar(&config.timeOut, "timeout", 0, "timeout in seconds")
 }
 
@@ -75,7 +77,7 @@ func runApp() error {
 		reader := bufio.NewReader(os.Stdin)
 		doc = html2data.FromReader(reader)
 	} else if strings.HasPrefix(config.url, "http://") || strings.HasPrefix(config.url, "https://") {
-		doc = html2data.FromURL(config.url, html2data.URLCfg{UA: config.userAgent, TimeOut: config.timeOut})
+		doc = html2data.FromURL(config.url, html2data.URLCfg{UA: config.userAgent, TimeOut: config.timeOut, DontDetectCharset: config.dontDetectCharset})
 	} else if len(config.url) > 0 {
 		doc = html2data.FromFile(config.url)
 	} else {

@@ -61,7 +61,7 @@ import (
 func main() {
     doc := html2data.FromURL("http://example.com")
     // or with config
-    // doc := html2data.FromURL("http://example.com", html2data.URLCfg{UA: "userAgent", TimeOut: 10})
+    // doc := html2data.FromURL("http://example.com", html2data.URLCfg{UA: "userAgent", TimeOut: 10, DontDetectCharset: false})
     if doc.Err != nil {
         log.Fatal(doc.Err)
     }
@@ -105,6 +105,7 @@ Command line utility
   * `-find-in="outer.css.selector"` -- search in the specified elements instead document
   * `-json` -- get result as JSON
   * `-dont-trim-spaces` -- get text as is
+  * `-dont-detect-charset` -- dont detect charset and convert text
   * `-timeout=10` -- setting timeout when loading the URL
 
 ### Install
