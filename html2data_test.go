@@ -572,7 +572,7 @@ func ExampleFromURL() {
 	}
 
 	// or with config
-	doc = FromURL("http://example.com", URLCfg{UA: "userAgent", TimeOut: 10})
+	doc = FromURL("http://example.com", URLCfg{UA: "userAgent", TimeOut: 10, DontDetectCharset: false})
 	if doc.Err != nil {
 		log.Fatal(doc.Err)
 	}
@@ -679,7 +679,7 @@ func ExampleDoc_GetDataNestedFirst() {
 func Example() {
 	doc := FromURL("http://example.com")
 	// or with config
-	// doc := FromURL("http://example.com", URLCfg{UA: "userAgent", TimeOut: 10})
+	// doc := FromURL("http://example.com", URLCfg{UA: "userAgent", TimeOut: 10, DontDetectCharset: true})
 	if doc.Err != nil {
 		log.Fatal(doc.Err)
 	}
