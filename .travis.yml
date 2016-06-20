@@ -11,12 +11,10 @@ before_install:
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
 
-install: go get -t ./...
-
 script:
-  - go test -v ./...
-  - if [ "$TRAVIS_GO_VERSION" = "1.6" ]; then go test -race -v ./...; fi
-  - go vet ./...
+  - go test -v . ./cmd/html2data
+  - if [ "$TRAVIS_GO_VERSION" = "1.6" ]; then go test -race -v . ./cmd/html2data; fi
+  - go vet . ./cmd/html2data
   - diff <(gofmt -d .) <(echo -n "")
   - go test -coverprofile=cmd.coverprofile ./cmd/html2data
   - go test -coverprofile=main.coverprofile
