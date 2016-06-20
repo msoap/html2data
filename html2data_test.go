@@ -59,7 +59,7 @@ func Test_GetDataSingle(t *testing.T) {
 			"<div>",
 			"div<<<",
 			"",
-			fmt.Errorf("error"),
+			nil,
 		},
 	}
 
@@ -122,8 +122,8 @@ func Test_GetData(t *testing.T) {
 			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
 			css:  map[string]string{"title": "title<<"},
 			cfg:  []Cfg{},
-			out:  map[string][]string{},
-			err:  fmt.Errorf("error"),
+			out:  map[string][]string{"title": []string{}},
+			err:  nil,
 		},
 	}
 
@@ -186,8 +186,8 @@ func Test_GetDataFirst(t *testing.T) {
 			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
 			css:  map[string]string{"title": "title<<"},
 			cfg:  []Cfg{},
-			out:  nil,
-			err:  fmt.Errorf("error"),
+			out:  map[string]string{"title": ""},
+			err:  nil,
 		}, {
 			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
 			css:  map[string]string{"title": "title", "h3": "h3"},
@@ -268,14 +268,14 @@ func Test_GetDataNested(t *testing.T) {
 			"div.cl<<",
 			map[string]string{"urls": "a:attr(href)"},
 			[]map[string][]string{},
-			fmt.Errorf("error"),
+			nil,
 		},
 		{
 			"<div class=cl>one</div>",
 			"div.cl",
 			map[string]string{"urls": "div<<"},
-			[]map[string][]string{},
-			fmt.Errorf("error"),
+			[]map[string][]string{map[string][]string{"urls": []string{}}},
+			nil,
 		},
 	}
 
@@ -291,7 +291,7 @@ func Test_GetDataNested(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(item.out, out) {
-			t.Errorf("\nhtml: %s\ncss: %s\nexpected: %#v\nreal    : %#v", item.html, item.css, item.out, out)
+			t.Errorf("\n%d. html: %s\ncss: %s\nexpected: %#v\nreal    : %#v", i, item.html, item.css, item.out, out)
 		}
 	}
 }
@@ -315,15 +315,15 @@ func Test_GetDataNestedFirst(t *testing.T) {
 			"<div class=cl>one</div>",
 			"div.cl<<",
 			map[string]string{"urls": "a:attr(href)"},
+			[]map[string]string{},
 			nil,
-			fmt.Errorf("error"),
 		},
 		{
 			"<div class=cl>one</div>",
 			"div.cl",
 			map[string]string{"urls": "div<<"},
+			[]map[string]string{{"urls": ""}},
 			nil,
-			fmt.Errorf("error"),
 		},
 	}
 
@@ -339,7 +339,7 @@ func Test_GetDataNestedFirst(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(item.out, out) {
-			t.Errorf("\nhtml: %s\ncss: %s\nexpected: %#v\nreal    : %#v", item.html, item.css, item.out, out)
+			t.Errorf("\n%d. html: %s\ncss: %s\nexpected: %#v\nreal    : %#v", i, item.html, item.css, item.out, out)
 		}
 	}
 }
