@@ -13,7 +13,7 @@ before_install:
 
 script:
   - go test -v . ./cmd/html2data
-  - if [ "$TRAVIS_GO_VERSION" = "1.6" ]; then go test -race -v . ./cmd/html2data; fi
+  - if [ "$TRAVIS_GO_VERSION" = "1.6.2" ]; then go test -race -v . ./cmd/html2data; fi
   - go vet . ./cmd/html2data
   - diff <(gofmt -d .) <(echo -n "")
   - go test -coverprofile=cmd.coverprofile ./cmd/html2data
