@@ -122,7 +122,7 @@ func Test_GetData(t *testing.T) {
 			html: "<title>Title</title>one<h1>head</h1>two<H1>Head 2</H1>",
 			css:  map[string]string{"title": "title<<"},
 			cfg:  []Cfg{},
-			out:  map[string][]string{"title": []string{}},
+			out:  map[string][]string{"title": {}},
 			err:  nil,
 		},
 	}
@@ -274,7 +274,7 @@ func Test_GetDataNested(t *testing.T) {
 			"<div class=cl>one</div>",
 			"div.cl",
 			map[string]string{"urls": "div<<"},
-			[]map[string][]string{map[string][]string{"urls": []string{}}},
+			[]map[string][]string{{"urls": {}}},
 			nil,
 		},
 	}
