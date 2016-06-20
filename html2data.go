@@ -296,7 +296,7 @@ func getHTMLPage(url string, ua string, timeout int, dontDetectCharset bool) (ht
 	cookie, _ := cookiejar.New(nil)
 	client := &http.Client{
 		Jar:     cookie,
-		Timeout: time.Duration(timeout) * time.Second,
+		Timeout: time.Duration(time.Duration(timeout) * time.Second),
 	}
 
 	request, err := http.NewRequest("GET", url, nil)
