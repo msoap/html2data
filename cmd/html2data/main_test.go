@@ -101,16 +101,4 @@ func Test_main(t *testing.T) {
 	if err == nil {
 		t.Errorf("8. main() failed: got: '%s'", out)
 	}
-
-	// error in selectors
-	out, err = mainWrapper(t, []string{"html2data", "test.html", "h1<<"})
-	if err == nil {
-		t.Errorf("9. main() failed: got: '%s'", out)
-	}
-
-	// error in selectors nested
-	out, err = mainWrapper(t, []string{"html2data", "-find-in=div.article", "test.html", "h1<<"})
-	if err == nil {
-		t.Errorf("10. main() failed: got: '%s'", out)
-	}
 }
