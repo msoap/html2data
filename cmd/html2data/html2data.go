@@ -93,11 +93,7 @@ func runApp() error {
 		}
 
 		if config.getJSON {
-			jsonObject := []map[string][]string{}
-			for _, texts := range textsOuter {
-				jsonObject = append(jsonObject, texts)
-			}
-			json, _ := json.Marshal(jsonObject)
+			json, _ := json.Marshal(textsOuter)
 			fmt.Println(string(json))
 		} else {
 			for i, texts := range textsOuter {
