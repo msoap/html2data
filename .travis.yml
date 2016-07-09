@@ -10,11 +10,13 @@ before_install:
   - go get github.com/modocache/gover
   - go get github.com/mattn/goveralls
   - go get golang.org/x/tools/cmd/cover
+  - go get github.com/kisielk/errcheck
 
 script:
-  - go test -v . ./cmd/html2data
+  - go test -v . ./cmd/...
   - if [ "$TRAVIS_GO_VERSION" = "1.6.2" ]; then go test -race -v . ./cmd/html2data; fi
-  - go vet . ./cmd/html2data
+  - go vet . ./cmd/...
+  - errcheck . ./cmd/...
   - diff <(gofmt -d .) <(echo -n "")
   - go test -coverprofile=cmd.coverprofile ./cmd/html2data
   - go test -coverprofile=main.coverprofile
