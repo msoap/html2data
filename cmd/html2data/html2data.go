@@ -19,9 +19,9 @@ const usageString = "Usage:\n" +
 
 type cmdConfig struct {
 	userAgent, outerCSS, url string
+	timeOut                  int
 	getJSON                  bool
 	dontTrimSpaces           bool
-	timeOut                  int
 	dontDetectCharset        bool
 }
 
