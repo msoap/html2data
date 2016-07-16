@@ -1,6 +1,10 @@
 language: go
 sudo: false
 
+env:
+  global:
+    - CURRENT_GO_VERSION="1.6.2"
+
 go:
   - 1.6.2
   - tip
@@ -13,11 +17,13 @@ before_install:
 
 script:
   - go test -v . ./cmd/...
-  - if [ "$TRAVIS_GO_VERSION" = "1.6.2" ]; then go test -race -v . ./cmd/html2data; fi
+  - if [ "$TRAVIS_GO_VERSION" = "$CURRENT_GO_VERSION" ]; then go test -race -v . ./cmd/html2data; fi
   - go vet . ./cmd/...
   - errcheck . ./cmd/...
   - diff <(gofmt -d .) <(echo -n "")
   - go test -coverprofile=cmd.coverprofile ./cmd/html2data
   - go test -coverprofile=main.coverprofile
   - $HOME/gopath/bin/gover
-  - if [ "$TRAVIS_GO_VERSION" = "1.6.2" ]; then $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci || true; fi
+  - if [ "$TRAVIS_GO_VERSION" = "$CURRENT_GO_VERSION" ]; then
+      $HOME/gopath/bin/goveralls -coverprofile=gover.coverprofile -service=travis-ci || true;
+    fi
