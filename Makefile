@@ -8,3 +8,6 @@ lint:
 
 update-from-github:
 	go get -u github.com/msoap/html2data/cmd/html2data
+
+glide-update:
+	glide up --update-vendored --strip-vcs --strip-vendor
