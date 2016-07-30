@@ -3,10 +3,10 @@ sudo: false
 
 env:
   global:
-    - CURRENT_GO_VERSION="1.6.2"
+    - CURRENT_GO_VERSION="1.6.3"
 
 go:
-  - 1.6.2
+  - 1.6.3
   - tip
 
 before_install:
