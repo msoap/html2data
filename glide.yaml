@@ -1,15 +1,15 @@
 package: github.com/msoap/html2data
 import:
 - package: github.com/PuerkitoBio/goquery
-  version: 77cbaef46a3af185a3afb87f88a366f3dee2a904
+  version: v1.0.0
 - package: github.com/andybalholm/cascadia
   version: 3ad29d1ad1c4f2023e355603324348cf1f4b2d48
 - package: golang.org/x/net
-  version: 8bf2b39827dbadfd566c4fae7a8790d12be8b23c
+  version: 6a513affb38dc9788b449d59ffed099b8de18fa0
   subpackages:
   - html/charset
 - package: golang.org/x/text
-  version: e3c902a8b2c4c420ce61514795e05b8e28a6364e
+  version: 2910a502d2bf9e43193af9d68ca516529614eed3
   subpackages:
   - encoding
   - encoding/charmap
