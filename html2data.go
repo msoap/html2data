@@ -176,6 +176,10 @@ func (doc Doc) GetDataFirst(selectors map[string]string, configs ...Cfg) (result
 // GetDataNested - extract nested data by CSS-selectors from another CSS-selector
 //  texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
 func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string, configs ...Cfg) (result []map[string][]string, err error) {
+	if doc.Err != nil {
+		return result, fmt.Errorf("parse document error: %s", doc.Err)
+	}
+
 	selector := parseSelector(selectorRaw)
 	defer func() {
 		if errRecoverRaw := recover(); errRecoverRaw != nil {

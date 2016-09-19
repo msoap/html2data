@@ -534,6 +534,16 @@ func Test_FromURL(t *testing.T) {
 		t.Errorf("DontDetectCharset failed, span: '%s'", div)
 	}
 	ts.Close()
+
+	doc = FromURL("fake://url")
+	_, err = doc.GetDataNested("", map[string]string{})
+	if err == nil {
+		t.Error("GetDataNested not got error on fake URL")
+	}
+	_, err = doc.GetDataNestedFirst("", map[string]string{})
+	if err == nil {
+		t.Error("GetDataNestedFirst not got error on fake URL")
+	}
 }
 
 func Test_FromFile(t *testing.T) {
