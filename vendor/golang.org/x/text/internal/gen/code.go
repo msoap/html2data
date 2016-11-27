@@ -117,13 +117,7 @@ func (w *CodeWriter) WriteConst(name string, x interface{}) {
 
 	switch v.Type().Kind() {
 	case reflect.String:
-		// See golang.org/issue/13145.
-		const arbitraryCutoff = 16
-		if v.Len() > arbitraryCutoff {
-			w.printf("var %s %s = ", name, typeName(x))
-		} else {
-			w.printf("const %s %s = ", name, typeName(x))
-		}
+		w.printf("const %s %s = ", name, typeName(x))
 		w.WriteString(v.String())
 		w.printf("\n")
 	default:
@@ -187,6 +181,7 @@ func (w *CodeWriter) writeValue(v reflect.Value) {
 
 // WriteString writes a string literal.
 func (w *CodeWriter) WriteString(s string) {
+	s = strings.Replace(s, `\`, `\\`, -1)
 	io.WriteString(w.Hash, s) // content hash
 	w.Size += len(s)
 
