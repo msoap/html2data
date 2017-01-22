@@ -117,7 +117,7 @@ Or install from homebrew (MacOS):
     brew tap msoap/tools
     brew install html2data
     # update:
-    brew update; brew upgrade html2data
+    brew upgrade html2data
 
 ### examples
 
