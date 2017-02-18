@@ -85,7 +85,7 @@ func Test_parseArgs(t *testing.T) {
 	}
 
 	for i, item := range testData {
-		selectors := map[string]string{}
+		var selectors map[string]string
 		url, selectors, err := parseArgs(item.in)
 		out := parseArgsResult{url, selectors, err}
 

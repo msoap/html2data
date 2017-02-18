@@ -86,7 +86,7 @@ func (doc Doc) getDataFromDocOrSelection(docOrSelection docOrSelection, selector
 				return
 			}
 
-			foundText := ""
+			var foundText string
 			switch {
 			case selector.attrName != "":
 				foundText = selection.AttrOr(selector.attrName, "")
@@ -110,11 +110,11 @@ func (doc Doc) getDataFromDocOrSelection(docOrSelection docOrSelection, selector
 	return result, err
 }
 
+var htmlAttrRe = regexp.MustCompile(`^\s*(\w+)\s*(?:\(\s*(\w+)\s*\))?\s*$`)
+
 // parseSelector - parse pseudo-selectors:
 // :attr(href) - for getting attribute instead text node
 func parseSelector(inputSelector string) (outSelector CSSSelector) {
-	htmlAttrRe := regexp.MustCompile(`^\s*(\w+)\s*(?:\(\s*(\w+)\s*\))?\s*$`)
-
 	parts := strings.Split(inputSelector, ":")
 	outSelector.selector, parts = parts[0], parts[1:]
 	for _, part := range parts {
@@ -125,7 +125,7 @@ func parseSelector(inputSelector string) (outSelector CSSSelector) {
 		case len(reParts) == 3 && reParts[1] == "html":
 			outSelector.getHTML = true
 		case len(reParts) == 3 && reParts[1] == "get":
-			outSelector.getNth, _ = strconv.Atoi(reParts[2])
+			outSelector.getNth, _ = strconv.Atoi(reParts[2]) // #nosec
 		default:
 			outSelector.selector += ":" + part
 		}
@@ -297,7 +297,11 @@ func FromURL(URL string, config ...URLCfg) Doc {
 
 // getHTMLPage - get html by http(s) as http.Response
 func getHTMLPage(url string, ua string, timeout int, dontDetectCharset bool) (htmlReader io.Reader, err error) {
-	cookie, _ := cookiejar.New(nil)
+	cookie, err := cookiejar.New(nil)
+	if err != nil {
+		return htmlReader, err
+	}
+
 	client := &http.Client{
 		Jar:     cookie,
 		Timeout: time.Duration(timeout) * time.Second,
