@@ -3,6 +3,7 @@ sudo: false
 
 env:
   global:
+    - APP_NAME=html2data
     - CURRENT_GO_VERSION="1.8"
 
 go:
@@ -23,3 +24,26 @@ script:
   - if [[ $TRAVIS_GO_VERSION =~ $CURRENT_GO_VERSION ]]; then
       gocoverage && goveralls -coverprofile=profile.cov -service=travis-ci || true;
     fi
+
+before_deploy:
+  - curl -SL https://raw.githubusercontent.com/msoap/etc/master/golang-cross-build/golang-cross-build.sh > $GOPATH/bin/golang-cross-build.sh
+  - chmod 700 $GOPATH/bin/golang-cross-build.sh
+  - gem install --no-ri --no-rdoc fpm
+  - golang-cross-build.sh $APP_NAME ./cmd/$APP_NAME
+  - ls -l *.zip *.tar.gz *.deb
+
+deploy:
+  provider: releases
+  api_key:
+    secure: Q7d88vpxXUFRISyC2+qYeP4dmyfFjI3Tbmw4Ru8l1zGY+1EhPRShdhctDr+VqVzZd0MoELmk9AHEgw3auz4tkpD9pOqpHAWKKyyfjKiqHpXt2jSJsRTlzsFNetaQd4Kup6CdS+ZGj0QIdHiB06CQf0y+wkM80/W/VDWHIlszNEkZiLNxy5X8OodISfCxxLMSym9TPZWauLwfYyZgYp/ONaqDJc2Zg108Ak45DAjJ4Ou/bK26tRZJWwTe1EBp56/P9gX99HMxGZUWKFOT4YyygKt7WyPuvDiqHjFJdW36WygttQvSSDW3JoFqks/PwAcxmGAXi5CZ/XQ+VFxs0LUkvAvFKTxa7hUkyLF674V2zQE4TS+P00V9slXvJj0UshxhiaWUA0LTWe+Chk31uuQP4tFgk0n3HP9CNHEzdnDcXHLRma4IOkrKPDmzlLoQHk7lmFv+UYf6zmnZ8eL2TYeA1GvQ4a0r18zQKS96HMxsvQ/msjwwiVPW84SDSlknqi3R4ME9cpYD5+2QFxYkTZauAbs+g+UF9G0U4Jspxz9RCoq33pp/+9QJX+qw80ctDzIYtfUNcVp2n3+rMt3Ow4sQ6BLZ+BXZ1ZT21hSbwOHS5jEJVIFTn/Y9CqbpKpcO/2kCFV/VL8hpsNUVjv4hXMCrjake3+qVWakP4kE0rm4WiGI=
+  file_glob: "true"
+  file:
+    - "*.zip"
+    - "*.tar.gz"
+    - "*.deb"
+  skip_cleanup: true
+  on:
+    tags: true
+    branch: master
+    condition: $TRAVIS_GO_VERSION =~ $CURRENT_GO_VERSION
+    repo: msoap/$APP_NAME
