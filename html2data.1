@@ -1,0 +1,241 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "HTML2DATA" "" "February 2017" "" ""
+Extract data from HTML via CSS selectors
+.
+.SH "Install"
+Install package and command line utility:
+.
+.IP "" 4
+.
+.nf
+
+go get \-u github\.com/msoap/html2data/cmd/html2data
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Install package only:
+.
+.IP "" 4
+.
+.nf
+
+go get \-u github\.com/msoap/html2data
+.
+.fi
+.
+.IP "" 0
+.
+.SH "Methods"
+.
+.IP "\(bu" 4
+\fBFromReader(io\.Reader)\fR \- create document for parse
+.
+.IP "\(bu" 4
+\fBFromURL(URL, [config URLCfg])\fR \- create document from http(s) URL
+.
+.IP "\(bu" 4
+\fBFromFile(file)\fR \- create document from local file
+.
+.IP "\(bu" 4
+\fBdoc\.GetData(css map[string]string)\fR \- get texts by CSS selectors
+.
+.IP "\(bu" 4
+\fBdoc\.GetDataFirst(css map[string]string)\fR \- get texts by CSS selectors, get first entry for each selector or ""
+.
+.IP "\(bu" 4
+\fBdoc\.GetDataNested(outerCss string, css map[string]string)\fR \- extract nested data by CSS\-selectors from another CSS\-selector
+.
+.IP "\(bu" 4
+\fBdoc\.GetDataNestedFirst(outerCss string, css map[string]string)\fR \- extract nested data by CSS\-selectors from another CSS\-selector, get first entry for each selector or ""
+.
+.IP "\(bu" 4
+\fBdoc\.GetDataSingle(css string)\fR \- get one result by one CSS selector
+.
+.IP "" 0
+.
+.P
+or with config:
+.
+.IP "\(bu" 4
+\fBdoc\.GetData(css map[string]string, html2data\.Cfg{DontTrimSpaces: true})\fR
+.
+.IP "\(bu" 4
+\fBdoc\.GetDataNested(outerCss string, css map[string]string, html2data\.Cfg{DontTrimSpaces: true})\fR
+.
+.IP "\(bu" 4
+\fBdoc\.GetDataSingle(css string, html2data\.Cfg{DontTrimSpaces: true})\fR
+.
+.IP "" 0
+.
+.SH "Pseudo\-selectors"
+.
+.IP "\(bu" 4
+\fB:attr(attr_name)\fR \- getting attribute instead text, for example getting urls from links: \fBa:attr(href)\fR
+.
+.IP "\(bu" 4
+\fB:html\fR \- getting HTML instead text
+.
+.IP "\(bu" 4
+\fB:get(N)\fR \- get n\-th element from list
+.
+.IP "" 0
+.
+.SH "Example"
+.
+.nf
+
+package main
+
+import (
+    "fmt"
+    "log"
+
+    "github\.com/msoap/html2data"
+)
+
+func main() {
+    doc := html2data\.FromURL("http://example\.com")
+    // or with config
+    // doc := html2data\.FromURL("http://example\.com", html2data\.URLCfg{UA: "userAgent", TimeOut: 10, DontDetectCharset: false})
+    if doc\.Err != nil {
+        log\.Fatal(doc\.Err)
+    }
+
+    // get title
+    title, _ := doc\.GetDataSingle("title")
+    fmt\.Println("Title is:", title)
+
+    title, _ = doc\.GetDataSingle("title", html2data\.Cfg{DontTrimSpaces: true})
+    fmt\.Println("Title as is, with spaces:", title)
+
+    texts, _ := doc\.GetData(map[string]string{"h1": "h1", "links": "a:attr(href)"})
+    // get all H1 headers:
+    if textOne, ok := texts["h1"]; ok {
+        for _, text := range textOne {
+            fmt\.Println(text)
+        }
+    }
+    // get all urls from links
+    if links, ok := texts["links"]; ok {
+        for _, text := range links {
+            fmt\.Println(text)
+        }
+    }
+}
+.
+.fi
+.
+.SH "Command line utility"
+.
+.SS "Usage"
+.
+.nf
+
+html2data [options] URL "css selector"
+html2data [options] URL :name1 "css1" :name2 "css2"\.\.\.
+html2data [options] file\.html "css selector"
+cat file\.html | html2data "css selector"
+.
+.fi
+.
+.SS "Options"
+.
+.IP "\(bu" 4
+\fB\-user\-agent="Custom UA"\fR \-\- set custom user\-agent
+.
+.IP "\(bu" 4
+\fB\-find\-in="outer\.css\.selector"\fR \-\- search in the specified elements instead document
+.
+.IP "\(bu" 4
+\fB\-json\fR \-\- get result as JSON
+.
+.IP "\(bu" 4
+\fB\-dont\-trim\-spaces\fR \-\- get text as is
+.
+.IP "\(bu" 4
+\fB\-dont\-detect\-charset\fR \-\- dont detect charset and convert text
+.
+.IP "\(bu" 4
+\fB\-timeout=10\fR \-\- setting timeout when loading the URL
+.
+.IP "" 0
+.
+.SS "Install"
+Download binaries from: releases \fIhttps://github\.com/msoap/html2data/releases\fR (OS X/Linux/Windows/RaspberryPi)
+.
+.P
+Or install from homebrew (MacOS):
+.
+.IP "" 4
+.
+.nf
+
+brew tap msoap/tools
+brew install html2data
+# update:
+brew upgrade html2data
+.
+.fi
+.
+.IP "" 0
+.
+.SS "examples"
+Get title of page:
+.
+.IP "" 4
+.
+.nf
+
+html2data https://golang\.org/ title
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Last blog posts:
+.
+.IP "" 4
+.
+.nf
+
+html2data https://blog\.golang\.org/ h3
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Getting RSS URL:
+.
+.IP "" 4
+.
+.nf
+
+html2data https://blog\.golang\.org/ \'link[type="application/atom+xml"]:attr(href)\'
+.
+.fi
+.
+.IP "" 0
+.
+.P
+More examples from wiki \fIhttps://github\.com/msoap/html2data/wiki/Examples\fR\.
+.
+.SH "See also"
+.
+.IP "\(bu" 4
+Python package with same name and functionality \fIhttps://pypi\.python\.org/pypi/html2data\fR
+.
+.IP "\(bu" 4
+Node\.js module \fIhttps://www\.npmjs\.com/package/html2data\fR
+.
+.IP "\(bu" 4
+Go package for CSS selectors \fIhttps://github\.com/PuerkitoBio/goquery/\fR
+.
+.IP "" 0
+
