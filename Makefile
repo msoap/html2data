@@ -19,7 +19,7 @@ glide-update:
 	glide up --update-vendored --strip-vcs --strip-vendor
 
 gometalinter:
-	gometalinter --vendor --cyclo-over=25 --line-length=150 --dupl-threshold=150 --min-occurrences=3 --enable=misspell --deadline=10m $$(glide novendor)
+	gometalinter --vendor --cyclo-over=25 --line-length=150 --dupl-threshold=150 --min-occurrences=3 --enable=misspell --deadline=10m --exclude=SA1022 $$(glide novendor)
 
 generate-manpage:
 	cat README.md | grep -v "^\[" > $(APP_NAME).md
