@@ -2,7 +2,7 @@ APP_NAME := html2data
 APP_DESCRIPTION := $$(awk 'NR == 11' README.md)
 APP_URL := https://github.com/msoap/$(APP_NAME)
 APP_MAINTAINER := $$(git show HEAD | awk '$$1 == "Author:" {print $$2 " " $$3 " " $$4}')
-GIT_TAG := $$(git tag 2>/dev/null | grep -E '^[0-9]+' | tail -1)
+GIT_TAG := $$(git describe --tags --abbrev=0)
 
 test:
 	go test -cover -race -v $$(glide novendor)
@@ -28,7 +28,7 @@ generate-manpage:
 	rm ./$(APP_NAME).{md,html}
 
 create-debian-amd64-package:
-	GOOS=linux GOARCH=amd64 go build -ldflags="-w" -o $(APP_NAME) ./cmd/html2data
+	GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o $(APP_NAME) ./cmd/html2data
 	docker run --rm -v $$PWD:/app -w /app msoap/ruby-fpm \
 		fpm -s dir -t deb --force --name $(APP_NAME) -v $(GIT_TAG) \
 			--license="$$(head -1 LICENSE)" \
