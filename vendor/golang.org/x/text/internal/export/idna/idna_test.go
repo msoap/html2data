@@ -33,6 +33,32 @@ func TestAllocToASCII(t *testing.T) {
 	}
 }
 
+func TestProfiles(t *testing.T) {
+	testCases := []struct {
+		name      string
+		want, got *Profile
+	}{
+		{"Punycode", punycode, New()},
+		{"Registration", registration, New(ValidateForRegistration())},
+		{"Registration", registration, New(
+			ValidateForRegistration(),
+			VerifyDNSLength(true),
+			BidiRule(),
+		)},
+		{"Lookup", lookup, New(MapForLookup(), BidiRule(), Transitional(true))},
+		{"Display", display, New(MapForLookup(), BidiRule())},
+	}
+	for _, tc := range testCases {
+		// Functions are not comparable, but the printed version will include
+		// their pointers.
+		got := fmt.Sprintf("%#v", tc.got)
+		want := fmt.Sprintf("%#v", tc.want)
+		if got != want {
+			t.Errorf("%s: \ngot  %#v,\nwant %#v", tc.name, got, want)
+		}
+	}
+}
+
 // doTest performs a single test f(input) and verifies that the output matches
 // out and that the returned error is expected. The errors string contains
 // all allowed error codes as categorized in
@@ -90,14 +116,67 @@ func TestLabelErrors(t *testing.T) {
 		name string
 		f    func(string) (string, error)
 	}
-	resolve := kind{"ToASCII", Resolve.ToASCII}
+	punyA := kind{"PunycodeA", punycode.ToASCII}
+	resolve := kind{"ResolveA", Lookup.ToASCII}
 	display := kind{"ToUnicode", Display.ToUnicode}
+	p := New(VerifyDNSLength(true), MapForLookup(), BidiRule())
+	lengthU := kind{"CheckLengthU", p.ToUnicode}
+	lengthA := kind{"CheckLengthA", p.ToASCII}
+	p = New(MapForLookup(), StrictDomainName(false))
+	std3 := kind{"STD3", p.ToASCII}
+
 	testCases := []struct {
 		kind
 		input   string
 		want    string
 		wantErr string
 	}{
+		{lengthU, "", "", "A4"}, // From UTS 46 conformance test.
+		{lengthA, "", "", "A4"},
+
+		{lengthU, "xn--", "", "A4"},
+		{lengthU, "foo.xn--", "foo.", "A4"}, // TODO: is dropping xn-- correct?
+		{lengthU, "xn--.foo", ".foo", "A4"},
+		{lengthU, "foo.xn--.bar", "foo..bar", "A4"},
+
+		{display, "xn--", "", ""},
+		{display, "foo.xn--", "foo.", ""}, // TODO: is dropping xn-- correct?
+		{display, "xn--.foo", ".foo", ""},
+		{display, "foo.xn--.bar", "foo..bar", ""},
+
+		{lengthA, "a..b", "a..b", "A4"},
+		{punyA, ".b", ".b", ""},
+		// For backwards compatibility, the Punycode profile does not map runes.
+		{punyA, "\u3002b", "xn--b-83t", ""},
+		{punyA, "..b", "..b", ""},
+
+		{lengthA, ".b", ".b", "A4"},
+		{lengthA, "\u3002b", ".b", "A4"},
+		{lengthA, "..b", "..b", "A4"},
+		{lengthA, "b..", "b..", ""},
+
+		// Sharpened Bidi rules for Unicode 10.0.0. Apply for ALL labels in ANY
+		// of the labels is RTL.
+		{lengthA, "\ufe05\u3002\u3002\U0002603e\u1ce0", "..xn--t6f5138v", "A4"},
+		{lengthA, "FAX\u2a77\U0001d186\u3002\U0001e942\U000e0181\u180c", "", "B6"},
+
+		{resolve, "a..b", "a..b", ""},
+		// Note that leading dots are not stripped. This is to be consistent
+		// with the Punycode profile as well as the conformance test.
+		{resolve, ".b", ".b", ""},
+		{resolve, "\u3002b", ".b", ""},
+		{resolve, "..b", "..b", ""},
+		{resolve, "b..", "b..", ""},
+
+		// Raw punycode
+		{punyA, "", "", ""},
+		{punyA, "*.foo.com", "*.foo.com", ""},
+		{punyA, "Foo.com", "Foo.com", ""},
+
+		// STD3 rules
+		{display, "*.foo.com", "*.foo.com", "P1"},
+		{std3, "*.foo.com", "*.foo.com", ""},
+
 		// Don't map U+2490 (DIGIT NINE FULL STOP). This is the behavior of
 		// Chrome, Safari, and IE. Firefox will first map ⒐ to 9. and return
 		// lab9.be.
@@ -105,7 +184,7 @@ func TestLabelErrors(t *testing.T) {
 		{display, "lab⒐be", "lab⒐be", "P1"},
 
 		{resolve, "plan⒐faß.de", "xn--planfass-c31e.de", "P1"}, // encode("plan⒐fass") + ".de"
-		{display, "plan⒐faß.de", "plan⒐faß.de", "P1"},
+		{display, "Plan⒐faß.de", "plan⒐faß.de", "P1"},
 
 		// Chrome 54.0 recognizes the error and treats this input verbatim as a
 		// search string.
@@ -165,8 +244,8 @@ func TestConformance(t *testing.T) {
 			section = strings.ToLower(strings.Split(s, " ")[0])
 		}
 	}))
-	transitional := New(Transitional(true), VerifyDNSLength(true))
-	nonTransitional := New(VerifyDNSLength(true))
+	transitional := New(Transitional(true), VerifyDNSLength(true), BidiRule(), MapForLookup())
+	nonTransitional := New(VerifyDNSLength(true), BidiRule(), MapForLookup())
 	for p.Next() {
 		started = true
 
@@ -220,4 +299,10 @@ func unescape(s string) string {
 		panic(err)
 	}
 	return s
+}
+
+func BenchmarkProfile(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Lookup.ToASCII("www.yahoogle.com")
+	}
 }
