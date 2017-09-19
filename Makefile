@@ -5,18 +5,18 @@ APP_MAINTAINER := $$(git show HEAD | awk '$$1 == "Author:" {print $$2 " " $$3 " 
 GIT_TAG := $$(git describe --tags --abbrev=0)
 
 test:
-	go test -cover -race -v $$(glide novendor)
+	go test -cover -race -v ./...
 
 lint:
 	golint $$(glide novendor)
-	go vet $$(glide novendor)
+	go vet ./...
 	errcheck $$(glide novendor)
 
 update-from-github:
 	go get -u github.com/msoap/$(APP_NAME)/cmd/$(APP_NAME)
 
-glide-update:
-	glide up --update-vendored --strip-vcs --strip-vendor
+dep-ensure:
+	dep ensure
 
 gometalinter:
 	gometalinter --vendor --cyclo-over=25 --line-length=150 --dupl-threshold=150 --min-occurrences=3 --enable=misspell --deadline=10m --exclude=SA1022 $$(glide novendor)
