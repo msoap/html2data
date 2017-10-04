@@ -17,6 +17,8 @@ update-from-github:
 
 dep-ensure:
 	dep ensure
+	dep prune
+	find ./vendor -name '*_test.go' -delete
 
 gometalinter:
 	gometalinter --vendor --cyclo-over=25 --line-length=150 --dupl-threshold=150 --min-occurrences=3 --enable=misspell --deadline=10m --exclude=SA1022 $$(glide novendor)
