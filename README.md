@@ -8,7 +8,7 @@ html2data
 [![Sourcegraph](https://sourcegraph.com/github.com/msoap/html2data/-/badge.svg)](https://sourcegraph.com/github.com/msoap/html2data?badge)
 [![Report Card](https://goreportcard.com/badge/github.com/msoap/html2data)](https://goreportcard.com/report/github.com/msoap/html2data)
 
-Extract data from HTML via CSS selectors
+Library and cli-utility for extracting data from HTML via CSS selectors
 
 Install
 -------
@@ -42,9 +42,9 @@ Methods
 Pseudo-selectors
 ----------------
 
-  * `:attr(attr_name)` - getting attribute instead text, for example getting urls from links: `a:attr(href)`
-  * `:html` - getting HTML instead text
-  * `:get(N)` - get n-th element from list
+  * `:attr(attr_name)` - getting attribute instead of text, for example getting urls from links: `a:attr(href)`
+  * `:html` - getting HTML instead of text
+  * `:get(N)` - getting n-th element from list
 
 Example
 -------
@@ -119,6 +119,10 @@ Or install from homebrew (MacOS):
     brew install html2data
     # update:
     brew upgrade html2data
+
+From source:
+
+    go get -u github.com/msoap/html2data/cmd/html2data
 
 ### examples
 
