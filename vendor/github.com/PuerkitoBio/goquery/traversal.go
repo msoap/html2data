@@ -612,6 +612,7 @@ func getChildrenNodes(nodes []*html.Node, st siblingType) []*html.Node {
 // type, skipping a specified node if required.
 func getChildrenWithSiblingType(parent *html.Node, st siblingType, skipNode *html.Node,
 	untilFunc func(*html.Node) bool) (result []*html.Node) {
+
 	// Create the iterator function
 	var iter = func(cur *html.Node) (ret *html.Node) {
 		// Based on the sibling type requested, iterate the right way
