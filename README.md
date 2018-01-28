@@ -106,7 +106,7 @@ Command line utility
   * `-find-in="outer.css.selector"` -- search in the specified elements instead document
   * `-json` -- get result as JSON
   * `-dont-trim-spaces` -- get text as is
-  * `-dont-detect-charset` -- dont detect charset and convert text
+  * `-dont-detect-charset` -- don't detect charset and convert text
   * `-timeout=10` -- setting timeout when loading the URL
 
 ### Install

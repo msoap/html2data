@@ -270,7 +270,7 @@ func FromFile(fileName string) Doc {
 type URLCfg struct {
 	UA                string // custom user-agent
 	TimeOut           int    // timeout in seconds
-	DontDetectCharset bool   // dont autoconvert to UTF8
+	DontDetectCharset bool   // don't autoconvert to UTF8
 }
 
 // FromURL - get doc from URL

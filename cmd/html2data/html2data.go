@@ -33,8 +33,8 @@ func init() {
 	flag.StringVar(&config.userAgent, "user-agent", "", "set custom user-agent")
 	flag.StringVar(&config.outerCSS, "find-in", "", "search in the specified elements instead document")
 	flag.BoolVar(&config.getJSON, "json", false, "JSON output")
-	flag.BoolVar(&config.dontTrimSpaces, "dont-trim-spaces", false, "dont trim spaces, get text as is")
-	flag.BoolVar(&config.dontDetectCharset, "dont-detect-charset", false, "dont detect charset and convert text")
+	flag.BoolVar(&config.dontTrimSpaces, "dont-trim-spaces", false, "don't trim spaces, get text as is")
+	flag.BoolVar(&config.dontDetectCharset, "dont-detect-charset", false, "don't detect charset and convert text")
 	flag.IntVar(&config.timeOut, "timeout", 0, "timeout in seconds")
 }
 
