@@ -93,8 +93,8 @@ func runApp() error {
 		}
 
 		if config.getJSON {
-			json, _ := json.Marshal(textsOuter)
-			fmt.Println(string(json))
+			jsonBytes, _ := json.Marshal(textsOuter)
+			fmt.Println(string(jsonBytes))
 		} else {
 			for i, texts := range textsOuter {
 				fmt.Printf("%d:\n", i)
@@ -108,8 +108,8 @@ func runApp() error {
 		}
 
 		if config.getJSON {
-			json, _ := json.Marshal(texts)
-			fmt.Println(string(json))
+			jsonBytes, _ := json.Marshal(texts)
+			fmt.Println(string(jsonBytes))
 		} else {
 			printAsText(texts, len(CSSSelectors) > 1)
 		}
