@@ -4,7 +4,6 @@ html2data
 [![GoDoc](https://godoc.org/github.com/msoap/html2data?status.svg)](https://godoc.org/github.com/msoap/html2data)
 [![Build Status](https://travis-ci.org/msoap/html2data.svg?branch=master)](https://travis-ci.org/msoap/html2data)
 [![Coverage Status](https://coveralls.io/repos/github/msoap/html2data/badge.svg?branch=master)](https://coveralls.io/github/msoap/html2data?branch=master)
-[![Homebrew formula exists](https://img.shields.io/badge/homebrew-🍺-d7af72.svg)](https://github.com/msoap/html2data#install-1)
 [![Sourcegraph](https://sourcegraph.com/github.com/msoap/html2data/-/badge.svg)](https://sourcegraph.com/github.com/msoap/html2data?badge)
 [![Report Card](https://goreportcard.com/badge/github.com/msoap/html2data)](https://goreportcard.com/report/github.com/msoap/html2data)
 
@@ -93,6 +92,9 @@ func main() {
 Command line utility
 --------------------
 
+[![Homebrew formula exists](https://img.shields.io/badge/homebrew-🍺-d7af72.svg)](https://github.com/msoap/html2data#install-1)
+[![Snap Status](https://build.snapcraft.io/badge/msoap/html2data.svg)](https://build.snapcraft.io/user/msoap/html2data)
+
 ### Usage
 
     html2data [options] URL "css selector"
@@ -119,6 +121,17 @@ Or install from homebrew (MacOS):
     brew install html2data
     # update:
     brew upgrade html2data
+
+Using snap (Ubuntu or any Linux distribution with snap):
+
+    # install stable version:
+    sudo snap install html2data
+    
+    # install the latest version:
+    sudo snap install --edge html2data
+    
+    # update
+    sudo snap refresh html2data
 
 From source:
 
