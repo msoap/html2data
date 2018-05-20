@@ -456,7 +456,7 @@ func Test_FromURL(t *testing.T) {
 
 	// test get Url
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "<div>data</div>")
+		_, _ = fmt.Fprintln(w, "<div>data</div>")
 	}))
 
 	doc := FromURL(ts.URL)
@@ -482,7 +482,7 @@ func Test_FromURL(t *testing.T) {
 	// test timeout
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(1200 * time.Millisecond)
-		fmt.Fprintln(w, "<div>data</div>")
+		_, _ = fmt.Fprintln(w, "<div>data</div>")
 	}))
 
 	doc = FromURL(ts.URL, URLCfg{TimeOut: 1})
@@ -493,7 +493,7 @@ func Test_FromURL(t *testing.T) {
 
 	// test parse
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "<div><a>data</a></div>")
+		_, _ = fmt.Fprintln(w, "<div><a>data</a></div>")
 	}))
 
 	doc = FromURL(ts.URL)
@@ -512,7 +512,7 @@ func Test_FromURL(t *testing.T) {
 
 	// UA test
 	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "<div>"+r.UserAgent()+"</div><span id=2>Тест</span>")
+		_, _ = fmt.Fprintln(w, "<div>"+r.UserAgent()+"</div><span id=2>Тест</span>")
 	}))
 
 	customUA := "CustomUA/1.0"

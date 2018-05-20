@@ -89,7 +89,7 @@ func Test_main(t *testing.T) {
 
 	// from URL
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "<div>data</div>")
+		_, _ = fmt.Fprintln(w, "<div>data</div>")
 	}))
 	out, err = mainWrapper(t, []string{"html2data", ts.URL, "div"})
 	if err != nil || out != "data" {
