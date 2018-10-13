@@ -4,15 +4,14 @@ sudo: false
 env:
   global:
     - APP_NAME=html2data
-    - CURRENT_GO_VERSION="1.10"
-
-go:
-  - 1.9.x
-  - 1.10.x
-  - master
 
 matrix:
   fast_finish: true
+  include:
+    - go: 1.10.x
+    - go: 1.x
+      env: IS_LATEST_GO=true
+    - go: master
   allow_failures:
     - go: master
 
@@ -25,7 +24,7 @@ script:
   - go vet ./...
   - errcheck ./...
   - diff <(gofmt -d *.go cmd/html2data/*.go) <(echo -n "")
-  - if [[ $TRAVIS_GO_VERSION =~ $CURRENT_GO_VERSION ]]; then
+  - if [[ "$IS_LATEST_GO" == "true" ]]; then
       go test -covermode=count -coverprofile=profile.cov ./... && goveralls -coverprofile=profile.cov -service=travis-ci || true;
     fi
 
@@ -49,5 +48,5 @@ deploy:
   on:
     tags: true
     branch: master
-    condition: $TRAVIS_GO_VERSION =~ $CURRENT_GO_VERSION
+    condition: $IS_LATEST_GO = true
     repo: msoap/$APP_NAME
