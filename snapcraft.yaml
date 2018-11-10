@@ -1,5 +1,5 @@
 name: html2data
-version: '1.2'
+version: '1.2.1'
 summary: extract data from HTML via CSS selectors
 description: Command line utility for extracting data from HTML via CSS selectors.
 grade: stable
