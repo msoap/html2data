@@ -12,7 +12,7 @@ parts:
     plugin: go
     go-importpath: github.com/msoap/html2data
   go:
-    source-tag: go1.11
+    source-tag: go1.10
 
 apps:
   html2data:
