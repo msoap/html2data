@@ -10,7 +10,7 @@ import (
 type parseArgsResult struct {
 	url       string
 	selectors map[string]string
-	err       error
+	err       string
 }
 
 func Test_parseArgs(t *testing.T) {
@@ -23,7 +23,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "",
 				selectors: nil,
-				err:       fmt.Errorf("arguments is empty"),
+				err:       "arguments is empty",
 			},
 		},
 		{
@@ -31,7 +31,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "-",
 				selectors: map[string]string{"one": "div"},
-				err:       nil,
+				err:       "",
 			},
 		},
 		{
@@ -39,7 +39,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "-",
 				selectors: map[string]string{"name": "div"},
-				err:       nil,
+				err:       "",
 			},
 		},
 		{
@@ -47,7 +47,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "http://url",
 				selectors: map[string]string{"name": "div"},
-				err:       nil,
+				err:       "",
 			},
 		},
 		{
@@ -55,7 +55,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "http://url",
 				selectors: map[string]string{"one": "div"},
-				err:       nil,
+				err:       "",
 			},
 		},
 		{
@@ -63,7 +63,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "-",
 				selectors: map[string]string{"name1": "div1", "name2": "div2"},
-				err:       nil,
+				err:       "",
 			},
 		},
 		{
@@ -71,7 +71,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "file",
 				selectors: map[string]string{"name1": "div1", "name2": "div2"},
-				err:       nil,
+				err:       "",
 			},
 		},
 		{
@@ -79,7 +79,7 @@ func Test_parseArgs(t *testing.T) {
 			out: parseArgsResult{
 				url:       "",
 				selectors: nil,
-				err:       fmt.Errorf("name '%s' is not valid, must begin from ':'", "name2"),
+				err:       fmt.Sprintf("name '%s' is not valid, must begin from ':'", "name2"),
 			},
 		},
 	}
@@ -87,7 +87,11 @@ func Test_parseArgs(t *testing.T) {
 	for i, item := range testData {
 		var selectors map[string]string
 		url, selectors, err := parseArgs(item.in)
-		out := parseArgsResult{url, selectors, err}
+		errMsg := ""
+		if err != nil {
+			errMsg = err.Error()
+		}
+		out := parseArgsResult{url, selectors, errMsg}
 
 		if !reflect.DeepEqual(item.out, out) {
 			t.Errorf("\n%d. expected: %#v\n       real: %#v", i, item.out, out)
