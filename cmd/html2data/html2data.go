@@ -93,7 +93,10 @@ func runApp() error {
 		}
 
 		if config.getJSON {
-			jsonBytes, _ := json.Marshal(textsOuter)
+			jsonBytes, err := json.Marshal(textsOuter)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(jsonBytes))
 		} else {
 			for i, texts := range textsOuter {
@@ -108,7 +111,10 @@ func runApp() error {
 		}
 
 		if config.getJSON {
-			jsonBytes, _ := json.Marshal(texts)
+			jsonBytes, err := json.Marshal(texts)
+			if err != nil {
+				return err
+			}
 			fmt.Println(string(jsonBytes))
 		} else {
 			printAsText(texts, len(CSSSelectors) > 1)

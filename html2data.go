@@ -252,7 +252,7 @@ func FromReader(reader io.Reader) Doc {
 
 // FromFile - get doc from file
 func FromFile(fileName string) Doc {
-	fileReader, err := os.Open(fileName)
+	fileReader, err := os.Open(fileName) // #nosec
 	if err != nil {
 		return Doc{Err: err}
 	}
