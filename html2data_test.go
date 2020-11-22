@@ -455,7 +455,7 @@ func Test_FromURL(t *testing.T) {
 	assertPanic(t, func() { FromURL("url", URLCfg{}, URLCfg{}) }, "FromURL() with 2 arguments")
 
 	// test get Url
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = fmt.Fprintln(w, "<div>data</div>")
 	}))
 
@@ -480,7 +480,7 @@ func Test_FromURL(t *testing.T) {
 	}
 
 	// test timeout
-	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		time.Sleep(1200 * time.Millisecond)
 		_, _ = fmt.Fprintln(w, "<div>data</div>")
 	}))
@@ -492,7 +492,7 @@ func Test_FromURL(t *testing.T) {
 	ts.Close()
 
 	// test parse
-	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = fmt.Fprintln(w, "<div><a>data</a></div>")
 	}))
 
