@@ -4,18 +4,15 @@ summary: extract data from HTML via CSS selectors
 description: Command line utility for extracting data from HTML via CSS selectors.
 grade: stable
 confinement: strict
-base: core20
-
+base: core18
 parts:
   html2data:
-    after: [go]
-    source: .
     plugin: go
     go-importpath: github.com/msoap/html2data
-  go:
-    source-tag: go1.10
+    source: .
+    source-type: git
 
 apps:
   html2data:
-    command: html2data
+    command: bin/html2data
     plugs: [network, home]
