@@ -2,7 +2,6 @@ html2data
 =========
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/msoap/html2data.svg)](https://pkg.go.dev/github.com/msoap/html2data)
-[![Build Status](https://travis-ci.org/msoap/html2data.svg?branch=master)](https://travis-ci.org/msoap/html2data)
 [![Go](https://github.com/msoap/html2data/actions/workflows/go.yml/badge.svg)](https://github.com/msoap/html2data/actions/workflows/go.yml)
 [![Coverage Status](https://coveralls.io/repos/github/msoap/html2data/badge.svg?branch=master)](https://coveralls.io/github/msoap/html2data?branch=master)
 [![Sourcegraph](https://sourcegraph.com/github.com/msoap/html2data/-/badge.svg)](https://sourcegraph.com/github.com/msoap/html2data?badge)
