@@ -93,7 +93,6 @@ Command line utility
 --------------------
 
 [![Homebrew formula exists](https://img.shields.io/badge/homebrew-🍺-d7af72.svg)](https://github.com/msoap/html2data#install-1)
-[![Snap Status](https://build.snapcraft.io/badge/msoap/html2data.svg)](https://snapcraft.io/html2data)
 
 ### Usage
 
