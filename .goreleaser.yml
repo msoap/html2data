@@ -1,0 +1,64 @@
+release:
+  name_template: "{{ .Version }} - {{ .Date }}"
+  header: |
+    [![Github Releases (by Release)](https://img.shields.io/github/downloads/msoap/html2data/{{ .Tag }}/total.svg)]() [![Github All Releases](https://img.shields.io/github/downloads/msoap/html2data/total.svg)](https://github.com/msoap/html2data/releases/latest)
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main:
+      - ./cmd/html2data
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+
+nfpms:
+  - 
+    homepage: https://github.com/msoap/{{ .ProjectName }}
+    description: CLI-utility for extracting data from HTML via CSS selectors.
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    contents:
+      - src: html2data.1
+        dst: /usr/share/man/man1/html2data.1
+
+archives:
+  -
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README*
+      - LICENSE*
+      - "*.1"
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}"
+
+changelog:
+  sort: desc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^Merge branch'
+      - '^go fmt'
