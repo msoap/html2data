@@ -6,8 +6,7 @@ release:
 builds:
   - env:
       - CGO_ENABLED=0
-    main:
-      - ./cmd/html2data
+    main: ./cmd/html2data
     goos:
       - linux
       - darwin
@@ -23,7 +22,7 @@ builds:
     flags:
       - -trimpath
     ldflags:
-      - -s -w
+      - '-s -w'
 
 nfpms:
   - 
