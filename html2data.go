@@ -3,7 +3,7 @@ Package html2data - extract data from HTML via CSS selectors
 
 Install package and command line utility:
 
-	go get -u github.com/msoap/html2data/cmd/html2data
+	go install github.com/msoap/html2data/cmd/html2data@latest
 
 Install package only:
 
