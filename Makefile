@@ -12,9 +12,6 @@ lint:
 	go vet ./...
 	errcheck ./...
 
-update-from-github:
-	go get -u github.com/msoap/$(APP_NAME)/cmd/$(APP_NAME)
-
 gometalinter:
 	gometalinter --vendor --cyclo-over=25 --line-length=150 --dupl-threshold=150 --min-occurrences=3 --enable=misspell --deadline=10m --exclude=SA1022 ./...
 
