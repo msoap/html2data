@@ -224,7 +224,7 @@ Get title of page:
 .
 .nf
 
-html2data https://golang\.org/ title
+html2data https://go\.dev/ title
 .
 .fi
 .
@@ -237,7 +237,7 @@ Last blog posts:
 .
 .nf
 
-html2data https://blog\.golang\.org/ h3
+html2data https://go\.dev/blog/ \'div#blogindex p\.blogtitle a\'
 .
 .fi
 .
@@ -250,7 +250,7 @@ Getting RSS URL:
 .
 .nf
 
-html2data https://blog\.golang\.org/ \'link[type="application/atom+xml"]:attr(href)\'
+html2data https://go\.dev/blog/ \'link[type="application/atom+xml"]:attr(href)\'
 .
 .fi
 .

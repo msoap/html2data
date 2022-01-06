@@ -140,15 +140,15 @@ From source:
 
 Get title of page:
 
-    html2data https://golang.org/ title
+    html2data https://go.dev/ title
 
 Last blog posts:
 
-    html2data https://blog.golang.org/ h3
+    html2data https://go.dev/blog/ 'div#blogindex p.blogtitle a'
 
 Getting RSS URL:
 
-    html2data https://blog.golang.org/ 'link[type="application/atom+xml"]:attr(href)'
+    html2data https://go.dev/blog/ 'link[type="application/atom+xml"]:attr(href)'
 
 More examples from [wiki](https://github.com/msoap/html2data/wiki/Examples).
 
