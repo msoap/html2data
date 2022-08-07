@@ -22,7 +22,6 @@ Command line utility:
 	html2data URL "css selector"
 	html2data file.html "css selector"
 	cat file.html | html2data "css selector"
-
 */
 package html2data
 
@@ -147,14 +146,16 @@ func getConfig(configs []Cfg) Cfg {
 }
 
 // GetData - extract data by CSS-selectors
-//  texts, err := doc.GetData(map[string]string{"h1": "h1"})
+//
+//	texts, err := doc.GetData(map[string]string{"h1": "h1"})
 func (doc Doc) GetData(selectors map[string]string, configs ...Cfg) (result map[string][]string, err error) {
 	result, err = doc.getDataFromDocOrSelection(doc.doc, selectors, getConfig(configs))
 	return result, err
 }
 
 // GetDataFirst - extract data by CSS-selectors, get first entry for each selector or ""
-//  texts, err := doc.GetDataFirst(map[string]string{"h1": "h1"})
+//
+//	texts, err := doc.GetDataFirst(map[string]string{"h1": "h1"})
 func (doc Doc) GetDataFirst(selectors map[string]string, configs ...Cfg) (result map[string]string, err error) {
 	resultRaw, err := doc.getDataFromDocOrSelection(doc.doc, selectors, getConfig(configs))
 	if err != nil {
@@ -174,7 +175,8 @@ func (doc Doc) GetDataFirst(selectors map[string]string, configs ...Cfg) (result
 }
 
 // GetDataNested - extract nested data by CSS-selectors from another CSS-selector
-//  texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
+//
+//	texts, err := doc.GetDataNested("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
 func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]string, configs ...Cfg) (result []map[string][]string, err error) {
 	if doc.Err != nil {
 		return result, fmt.Errorf("parse document error: %s", doc.Err)
@@ -207,7 +209,8 @@ func (doc Doc) GetDataNested(selectorRaw string, nestedSelectors map[string]stri
 
 // GetDataNestedFirst - extract nested data by CSS-selectors from another CSS-selector
 // get first entry for each selector or ""
-//  texts, err := doc.GetDataNestedFirst("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
+//
+//	texts, err := doc.GetDataNestedFirst("CSS.selector", map[string]string{"h1": "h1"}) - get h1 from CSS.selector
 func (doc Doc) GetDataNestedFirst(selectorRaw string, nestedSelectors map[string]string, configs ...Cfg) (result []map[string]string, err error) {
 	resultRaw, err := doc.GetDataNested(selectorRaw, nestedSelectors, configs...)
 	if err != nil {
@@ -230,7 +233,8 @@ func (doc Doc) GetDataNestedFirst(selectorRaw string, nestedSelectors map[string
 }
 
 // GetDataSingle - extract data by one CSS-selector
-//  title, err := doc.GetDataSingle("title")
+//
+//	title, err := doc.GetDataSingle("title")
 func (doc Doc) GetDataSingle(selector string, configs ...Cfg) (result string, err error) {
 	texts, err := doc.GetData(map[string]string{"single": selector}, getConfig(configs))
 	if err != nil {
@@ -275,8 +279,8 @@ type URLCfg struct {
 
 // FromURL - get doc from URL
 //
-//  FromURL("https://url")
-//  FromURL("https://url", URLCfg{UA: "Custom UA 1.0", TimeOut: 10})
+//	FromURL("https://url")
+//	FromURL("https://url", URLCfg{UA: "Custom UA 1.0", TimeOut: 10})
 func FromURL(URL string, config ...URLCfg) Doc {
 	ua, timeout, dontDetectCharset := "", 0, false
 	if len(config) == 1 {
