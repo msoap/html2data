@@ -151,10 +151,3 @@ Getting RSS URL:
     html2data https://go.dev/blog/ 'link[type="application/atom+xml"]:attr(href)'
 
 More examples from [wiki](https://github.com/msoap/html2data/wiki/Examples).
-
-See also
---------
-
-  * [Python package with same name and functionality](https://pypi.python.org/pypi/html2data)
-  * [Node.js module](https://www.npmjs.com/package/html2data)
-  * [Go package for CSS selectors](https://github.com/PuerkitoBio/goquery/)
