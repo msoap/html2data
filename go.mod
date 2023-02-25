@@ -1,8 +1,13 @@
 module github.com/msoap/html2data
 
-go 1.14
+go 1.18
 
 require (
-	github.com/PuerkitoBio/goquery v1.8.0
-	golang.org/x/net v0.0.0-20220805013720-a33c5aa5df48
+	github.com/PuerkitoBio/goquery v1.8.1
+	golang.org/x/net v0.7.0
+)
+
+require (
+	github.com/andybalholm/cascadia v1.3.1 // indirect
+	golang.org/x/text v0.7.0 // indirect
 )
